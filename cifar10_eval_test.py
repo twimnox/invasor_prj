@@ -15,6 +15,9 @@ data set, compile the program and train the model.
 
 http://tensorflow.org/tutorials/deep_cnn/
 """
+
+
+#did i just change this ?!?!?!
 from datetime import datetime
 import math
 import time
