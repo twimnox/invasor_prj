@@ -1,29 +1,51 @@
-import MainWindow as mw_gui
+import Gui.MainWindow as mw_gui
+from DialogLoadDataIntel import Ui_Data_Dialog_interaction as Ui_Data_Import_Tab
 import cv2
 import yaml
 import os
 from PySide import QtCore, QtGui
+
+from Gui.MainWindow import Ui_MainWindow
 
 ML_CLASSES = 0
 TMP_DIR = "./tmp"
 CONFIG_DIR = "./yaml"
 
 
-def load_img(img_path):
-    tmp_name = os.path.join(TMP_DIR, "_tmp_img.jpg") #use tempfile python lib?
-    tmp_img = cv2.imread(img_path)
-    cv2.imwrite(tmp_name, tmp_img)
+class Ui_MainWindow_interaction(object):
 
-    img = QtGui.QImage(tmp_name)
-    ui.imglabel.setScaledContents(True)
-    ui.imglabel.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
-    ui.imglabel.setPixmap(QtGui.QPixmap.fromImage(img))
+    def load_img(img_path):
+        tmp_name = os.path.join(TMP_DIR, "_tmp_img.jpg") #use tempfile python lib?
+        tmp_img = cv2.imread(img_path)
+        cv2.imwrite(tmp_name, tmp_img)
 
+        img = QtGui.QImage(tmp_name)
+        ui.imglabel.setScaledContents(True)
+        ui.imglabel.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
+        ui.imglabel.setPixmap(QtGui.QPixmap.fromImage(img))
 
-def import_yaml(path_to_yaml):
-    global ML_CLASSES
-    stream = file(os.path.join(CONFIG_DIR, path_to_yaml), 'r')
-    ML_CLASSES = yaml.load(stream)
+    @staticmethod
+    def import_yaml(path_to_yaml):
+        global ML_CLASSES
+        stream = file(os.path.join(CONFIG_DIR, path_to_yaml), 'r')
+        return yaml.load(stream)
+
+    class Communicate(QtCore.QObject):
+        # create a new signal on the fly and name it 'speak'
+        speak = QtCore.Signal(str)
+
+    @QtCore.Slot(str)
+    def update_image(img_path):
+        #if nao for .jpg...
+        tmp_name = os.path.join(TMP_DIR, "_tmp_img.jpg")  # use tempfile python lib?
+        tmp_img = cv2.imread(img_path)
+        cv2.imwrite(tmp_name, tmp_img)
+
+        img = QtGui.QImage(tmp_name)
+        ui.imglabel.setScaledContents(True)
+        ui.imglabel.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
+        ui.imglabel.setPixmap(QtGui.QPixmap.fromImage(img))
+
 
 
 if __name__ == "__main__":
@@ -33,7 +55,19 @@ if __name__ == "__main__":
     ui = mw_gui.Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    load_img("./odm_orthphoto.png")
-    import_yaml('ml_classes.yaml')
-    print ML_CLASSES
+    # load_img("./odm_orthphoto.png")
+    Ui_interaction = Ui_MainWindow_interaction()
+    Ui_dit = Ui_Data_Import_Tab()
+
+
+    ml_classes = Ui_interaction.import_yaml('ml_classes.yaml')
+    print ml_classes
+
+
+
+
+    #Signals&Slots
+    ui.actionData_Import.triggered.connect(Ui_dit.open_dialog)
+
+
     sys.exit(app.exec_())

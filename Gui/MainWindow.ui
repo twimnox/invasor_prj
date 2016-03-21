@@ -75,7 +75,7 @@
     <property name="title">
      <string>Data</string>
     </property>
-    <addaction name="actionImage"/>
+    <addaction name="actionData_Import"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -94,7 +94,7 @@
     <string>Specifications</string>
    </property>
   </action>
-  <action name="actionImage">
+  <action name="actionData_Import">
    <property name="enabled">
     <bool>true</bool>
    </property>
