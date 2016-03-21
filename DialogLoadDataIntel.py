@@ -1,6 +1,7 @@
 import Gui.dialog_load_data as dld
 from PySide import QtCore, QtGui
 from PySide.QtCore import QObject, Signal, Slot
+import unicodedata
 
 
 class Ui_Data_Dialog_interaction(QObject):
@@ -12,27 +13,25 @@ class Ui_Data_Dialog_interaction(QObject):
         QObject.__init__(self)
 
         self.variables = variables
-        #print "ola", self.variables.export_data_path
         self.DataDialog = QtGui.QDialog()
         self.ui = dld.Ui_Dialog()
         self.ui.setupUi(self.DataDialog)
         self.main_ui = main_ui
 
-        #Signals&Slots
+        #Slots
         self.ui.btn_data_import_path.clicked.connect(self.open_file_dialog_import)
         self.ui.btn_data_output_folder.clicked.connect(self.open_file_dialog_export)
-        self.ui.btn_cancel.clicked.connect(self.on_cancel_click)
+        self.ui.btn_cancel.clicked.connect(self.cancel_click)
         self.ui.btn_ok.clicked.connect(self.ok_click)
 
 
 
-    def on_cancel_click(self):
+    def cancel_click(self):
         self.DataDialog.close()
 
     def ok_click(self):
         self.update_img.emit()
-
-
+        self.DataDialog.close()
 
 
     def open_dialog(self):
@@ -48,16 +47,16 @@ class Ui_Data_Dialog_interaction(QObject):
         """
         data_type = self.ui.comboBox_data_format.currentIndex()
         fileDialog = QtGui.QFileDialog()
-        fileDialog.setNameFilters("Image files (*.png *.tif, *.jpg)")
-        fileDialog.setFileMode(QtGui.QFileDialog.AnyFile)
+        #fileDialog.setNameFilters("Image files (*.png *.tif, *.jpg)")
+        #fileDialog.setFileMode(QtGui.QFileDialog.AnyFile)
 
         if data_type == 1: #multiple images
-            filename = str(fileDialog.getOpenFileNames()).encode('utf-8')
+            filename = (fileDialog.getOpenFileNames())
         else:
-            filename = str(fileDialog.getOpenFileName()).encode('utf-8')
+            filename = (fileDialog.getOpenFileName())
 
-        self.variables.import_data_path = filename
-        self.ui.text_data_import_path.setText(filename)
+        self.variables.import_data_path = str(filename)
+        self.ui.text_data_import_path.setText(str(filename))
 
     def open_file_dialog_export(self):
         """
@@ -67,10 +66,10 @@ class Ui_Data_Dialog_interaction(QObject):
         fileDialog = QtGui.QFileDialog()
         fileDialog.setNameFilters("Image files (*.png *.tif, *.jpg)")
         fileDialog.setFileMode(QtGui.QFileDialog.AnyFile)
-        filename = str(fileDialog.getExistingDirectory()).encode('utf-8')
+        filename = (fileDialog.getExistingDirectory())
 
-        self.variables.export_data_path = filename
-        self.ui.text_data_output_folder.setText(filename)
+        self.variables.export_data_path = str(filename)
+        self.ui.text_data_output_folder.setText(str(filename))
 
 
 
