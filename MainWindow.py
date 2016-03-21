@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainWindow.ui'
 #
-# Created: Fri Mar 18 17:11:11 2016
+# Created: Mon Mar 21 09:55:09 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -46,6 +46,7 @@ class Ui_MainWindow(object):
         self.actionImport = QtGui.QAction(MainWindow)
         self.actionImport.setObjectName("actionImport")
         self.actionImage = QtGui.QAction(MainWindow)
+        self.actionImage.setEnabled(True)
         self.actionImage.setObjectName("actionImage")
         self.actionMaps = QtGui.QAction(MainWindow)
         self.actionMaps.setObjectName("actionMaps")
@@ -53,11 +54,19 @@ class Ui_MainWindow(object):
         self.actionModel.setObjectName("actionModel")
         self.actionTest = QtGui.QAction(MainWindow)
         self.actionTest.setObjectName("actionTest")
+        self.actionAuthor = QtGui.QAction(MainWindow)
+        self.actionAuthor.setObjectName("actionAuthor")
+        self.actionVersion = QtGui.QAction(MainWindow)
+        self.actionVersion.setObjectName("actionVersion")
+        self.actionImport_Model = QtGui.QAction(MainWindow)
+        self.actionImport_Model.setObjectName("actionImport_Model")
+        self.menuModel.addAction(self.actionImport_Model)
         self.menuModel.addAction(self.actionImport)
         self.menuModel.addAction(self.actionTest)
+        self.menuModel.addSeparator()
         self.menuImport.addAction(self.actionImage)
-        self.menuImport.addAction(self.actionMaps)
-        self.menuImport.addAction(self.actionModel)
+        self.menuAbout.addAction(self.actionAuthor)
+        self.menuAbout.addAction(self.actionVersion)
         self.menubar.addAction(self.menuImport.menuAction())
         self.menubar.addAction(self.menuModel.menuAction())
         self.menubar.addAction(self.menuAbout.menuAction())
@@ -67,15 +76,18 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "MainWindow", None, QtGui.QApplication.UnicodeUTF8))
-        self.imglabel.setText(QtGui.QApplication.translate("MainWindow", "TextLabel", None, QtGui.QApplication.UnicodeUTF8))
+        self.imglabel.setText(QtGui.QApplication.translate("MainWindow", "No Image Loaded", None, QtGui.QApplication.UnicodeUTF8))
         self.menuModel.setTitle(QtGui.QApplication.translate("MainWindow", "Model", None, QtGui.QApplication.UnicodeUTF8))
-        self.menuImport.setTitle(QtGui.QApplication.translate("MainWindow", "Import", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuImport.setTitle(QtGui.QApplication.translate("MainWindow", "Data", None, QtGui.QApplication.UnicodeUTF8))
         self.menuAbout.setTitle(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
         self.actionImport.setText(QtGui.QApplication.translate("MainWindow", "Specifications", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionImage.setText(QtGui.QApplication.translate("MainWindow", "Image", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionImage.setText(QtGui.QApplication.translate("MainWindow", "Import...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionMaps.setText(QtGui.QApplication.translate("MainWindow", "Maps", None, QtGui.QApplication.UnicodeUTF8))
         self.actionModel.setText(QtGui.QApplication.translate("MainWindow", "Model", None, QtGui.QApplication.UnicodeUTF8))
         self.actionTest.setText(QtGui.QApplication.translate("MainWindow", "Test", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionAuthor.setText(QtGui.QApplication.translate("MainWindow", "Author", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionVersion.setText(QtGui.QApplication.translate("MainWindow", "Version", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionImport_Model.setText(QtGui.QApplication.translate("MainWindow", "Import Model", None, QtGui.QApplication.UnicodeUTF8))
 
 
 if __name__ == "__main__":

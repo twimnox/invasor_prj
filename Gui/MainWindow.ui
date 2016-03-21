@@ -45,7 +45,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>No Image Loaded</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignJustify|Qt::AlignTop</set>
@@ -66,21 +66,23 @@
     <property name="title">
      <string>Model</string>
     </property>
+    <addaction name="actionImport_Model"/>
     <addaction name="actionImport"/>
     <addaction name="actionTest"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuImport">
     <property name="title">
-     <string>Import</string>
+     <string>Data</string>
     </property>
     <addaction name="actionImage"/>
-    <addaction name="actionMaps"/>
-    <addaction name="actionModel"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
      <string>About</string>
     </property>
+    <addaction name="actionAuthor"/>
+    <addaction name="actionVersion"/>
    </widget>
    <addaction name="menuImport"/>
    <addaction name="menuModel"/>
@@ -93,8 +95,11 @@
    </property>
   </action>
   <action name="actionImage">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Image</string>
+    <string>Import...</string>
    </property>
   </action>
   <action name="actionMaps">
@@ -110,6 +115,21 @@
   <action name="actionTest">
    <property name="text">
     <string>Test</string>
+   </property>
+  </action>
+  <action name="actionAuthor">
+   <property name="text">
+    <string>Author</string>
+   </property>
+  </action>
+  <action name="actionVersion">
+   <property name="text">
+    <string>Version</string>
+   </property>
+  </action>
+  <action name="actionImport_Model">
+   <property name="text">
+    <string>Import Model</string>
    </property>
   </action>
  </widget>
