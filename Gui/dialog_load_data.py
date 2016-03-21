@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'dialog_load_data.ui'
 #
-# Created: Mon Mar 21 12:41:15 2016
+# Created: Mon Mar 21 16:27:21 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,16 +13,6 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(529, 403)
-        self.buttonBox = QtGui.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(160, 340, 341, 32))
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.buttonBox.sizePolicy().hasHeightForWidth())
-        self.buttonBox.setSizePolicy(sizePolicy)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.buttonBox.setObjectName("buttonBox")
         self.comboBox_data_format = QtGui.QComboBox(Dialog)
         self.comboBox_data_format.setGeometry(QtCore.QRect(40, 50, 251, 27))
         self.comboBox_data_format.setObjectName("comboBox_data_format")
@@ -51,10 +41,14 @@ class Ui_Dialog(object):
         self.btn_data_output_folder = QtGui.QPushButton(Dialog)
         self.btn_data_output_folder.setGeometry(QtCore.QRect(400, 250, 99, 27))
         self.btn_data_output_folder.setObjectName("btn_data_output_folder")
+        self.btn_ok = QtGui.QPushButton(Dialog)
+        self.btn_ok.setGeometry(QtCore.QRect(410, 350, 99, 27))
+        self.btn_ok.setObjectName("btn_ok")
+        self.btn_cancel = QtGui.QPushButton(Dialog)
+        self.btn_cancel.setGeometry(QtCore.QRect(300, 350, 99, 27))
+        self.btn_cancel.setObjectName("btn_cancel")
 
         self.retranslateUi(Dialog)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), Dialog.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -67,4 +61,6 @@ class Ui_Dialog(object):
         self.label_2.setText(QtGui.QApplication.translate("Dialog", "Imported Data path:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("Dialog", "Export Results to:", None, QtGui.QApplication.UnicodeUTF8))
         self.btn_data_output_folder.setText(QtGui.QApplication.translate("Dialog", "Select Folder", None, QtGui.QApplication.UnicodeUTF8))
+        self.btn_ok.setText(QtGui.QApplication.translate("Dialog", "Ok", None, QtGui.QApplication.UnicodeUTF8))
+        self.btn_cancel.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
 

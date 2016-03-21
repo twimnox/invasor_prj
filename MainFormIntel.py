@@ -15,6 +15,10 @@ CONFIG_DIR = "./yaml"
 
 class Ui_MainWindow_interaction(object):
 
+    def __init__(self, ui, vars):
+        self.ui = ui
+        self.variables = vars
+
     def load_img(img_path):
         tmp_name = os.path.join(TMP_DIR, "_tmp_img.jpg") #use tempfile python lib?
         tmp_img = cv2.imread(img_path)
@@ -31,12 +35,11 @@ class Ui_MainWindow_interaction(object):
         stream = file(os.path.join(CONFIG_DIR, path_to_yaml), 'r')
         return yaml.load(stream)
 
-    class Communicate(QtCore.QObject):
-        # create a new signal on the fly and name it 'speak'
-        speak = QtCore.Signal(str)
 
-    @QtCore.Slot(str)
-    def update_image(img_path):
+
+    @QtCore.Slot()
+    def on_update_image(self, int):
+        img_path = self.variables.import_data_path
         #if nao for .jpg...
         tmp_name = os.path.join(TMP_DIR, "_tmp_img.jpg")  # use tempfile python lib?
         tmp_img = cv2.imread(img_path)
@@ -47,7 +50,9 @@ class Ui_MainWindow_interaction(object):
         ui.imglabel.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
         ui.imglabel.setPixmap(QtGui.QPixmap.fromImage(img))
 
-
+class Communicate(QtCore.QObject):
+    # create a new signal on the fly and name it 'speak'
+    speak = QtCore.Signal(str)
 
 if __name__ == "__main__":
     import sys
@@ -58,18 +63,22 @@ if __name__ == "__main__":
     MainWindow.show()
     # load_img("./odm_orthphoto.png")
 
-    Ui_interaction = Ui_MainWindow_interaction
-    Ui_dit = Ui_Data_Import_Tab(vars.Variables())
+    Ui_interaction = Ui_MainWindow_interaction(ui, vars.Variables())
+    Ui_dit = Ui_Data_Import_Tab(vars.Variables(), Ui_MainWindow)
 
 
     ml_classes = Ui_interaction.import_yaml('ml_classes.yaml')
     print ml_classes
 
 
-
-
-    #Signals&Slots
+    #Slots
     ui.actionData_Import.triggered.connect(Ui_dit.open_dialog)
+    #Ui_dit.ok_click().connect(Ui_interaction.on_update_image)
+    Ui_dit.update_img.connect(Ui_interaction.on_update_image)
+
+
+
+
 
 
     sys.exit(app.exec_())
