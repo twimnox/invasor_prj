@@ -4,6 +4,7 @@ import cv2
 import yaml
 import os
 from PySide import QtCore, QtGui
+from Utils import Variables as vars
 
 from Gui.MainWindow import Ui_MainWindow
 
@@ -56,8 +57,9 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     # load_img("./odm_orthphoto.png")
-    Ui_interaction = Ui_MainWindow_interaction()
-    Ui_dit = Ui_Data_Import_Tab()
+
+    Ui_interaction = Ui_MainWindow_interaction
+    Ui_dit = Ui_Data_Import_Tab(vars.Variables())
 
 
     ml_classes = Ui_interaction.import_yaml('ml_classes.yaml')
