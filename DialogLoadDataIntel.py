@@ -55,8 +55,10 @@ class Ui_Data_Dialog_interaction(QObject):
         else:
             filename = (fileDialog.getOpenFileName())
 
-        self.variables.import_data_path = str(filename)
-        self.ui.text_data_import_path.setText(str(filename))
+        format_filename = unicodedata.normalize('NFKD', filename[0]).encode('ascii','ignore')
+
+        self.variables.import_data_path = format_filename
+        self.ui.text_data_import_path.setText(format_filename)
 
     def open_file_dialog_export(self):
         """
@@ -68,8 +70,10 @@ class Ui_Data_Dialog_interaction(QObject):
         fileDialog.setFileMode(QtGui.QFileDialog.AnyFile)
         filename = (fileDialog.getExistingDirectory())
 
-        self.variables.export_data_path = str(filename)
-        self.ui.text_data_output_folder.setText(str(filename))
+        format_filename = unicodedata.normalize('NFKD', filename).encode('ascii','ignore')
+
+        self.variables.export_data_path = format_filename
+        self.ui.text_data_output_folder.setText(format_filename)
 
 
 
