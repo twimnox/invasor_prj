@@ -25,7 +25,6 @@ class Ui_MainWindow_interaction(object):
         tmp_name = os.path.join(TMP_DIR, "_tmp_img.jpg") #use tempfile python lib?
         tmp_img = cv2.imread(img_path)
         cv2.imwrite(tmp_name, tmp_img)
-
         img = QtGui.QImage(tmp_name)
         ui.imglabel.setScaledContents(True)
         ui.imglabel.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
