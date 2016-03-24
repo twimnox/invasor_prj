@@ -6,23 +6,24 @@ import unicodedata
 
 class Ui_Data_Dialog_interaction(QObject):
 
-    # signals
-    update_img = Signal()
-
-    def __init__(self, variables, main_ui):
+    def __init__(self, variables):
         QObject.__init__(self)
 
         self.variables = variables
         self.DataDialog = QtGui.QDialog()
         self.ui = dld.Ui_Dialog()
         self.ui.setupUi(self.DataDialog)
-        self.main_ui = main_ui
 
-        #Slots
+        #SLOTS
         self.ui.btn_data_import_path.clicked.connect(self.open_file_dialog_import)
         self.ui.btn_data_output_folder.clicked.connect(self.open_file_dialog_export)
         self.ui.btn_cancel.clicked.connect(self.cancel_click)
         self.ui.btn_ok.clicked.connect(self.ok_click)
+
+
+
+    #SIGNALS
+    update_img = Signal()
 
 
 

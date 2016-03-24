@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainWindow.ui'
 #
-# Created: Mon Mar 21 11:03:58 2016
+# Created: Thu Mar 24 14:41:50 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,26 +12,42 @@ from PySide import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(861, 614)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.frame = QtGui.QFrame(self.centralwidget)
-        self.frame.setGeometry(QtCore.QRect(180, 10, 611, 531))
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Maximum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
-        self.frame.setSizePolicy(sizePolicy)
-        self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtGui.QFrame.Raised)
-        self.frame.setObjectName("frame")
-        self.imglabel = QtGui.QLabel(self.frame)
-        self.imglabel.setGeometry(QtCore.QRect(10, 10, 590, 510))
-        self.imglabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignTop)
-        self.imglabel.setObjectName("imglabel")
+        self.horizontalLayout = QtGui.QHBoxLayout(self.centralwidget)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.main_splitter = QtGui.QSplitter(self.centralwidget)
+        self.main_splitter.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.main_splitter.setFrameShadow(QtGui.QFrame.Plain)
+        self.main_splitter.setLineWidth(2)
+        self.main_splitter.setMidLineWidth(2)
+        self.main_splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.main_splitter.setHandleWidth(10)
+        self.main_splitter.setObjectName("main_splitter")
+        self.widget_leftpanel = QtGui.QWidget(self.main_splitter)
+        self.widget_leftpanel.setMinimumSize(QtCore.QSize(50, 0))
+        self.widget_leftpanel.setObjectName("widget_leftpanel")
+        self.verticalLayout_3 = QtGui.QVBoxLayout(self.widget_leftpanel)
+        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.splitter_left_layout = QtGui.QVBoxLayout()
+        self.splitter_left_layout.setObjectName("splitter_left_layout")
+        self.verticalLayout_3.addLayout(self.splitter_left_layout)
+        self.widget_right_panel = QtGui.QWidget(self.main_splitter)
+        self.widget_right_panel.setObjectName("widget_right_panel")
+        self.verticalLayout_2 = QtGui.QVBoxLayout(self.widget_right_panel)
+        self.verticalLayout_2.setSpacing(0)
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.splitter_right_layout = QtGui.QVBoxLayout()
+        self.splitter_right_layout.setContentsMargins(0, 0, 0, 0)
+        self.splitter_right_layout.setObjectName("splitter_right_layout")
+        self.verticalLayout_2.addLayout(self.splitter_right_layout)
+        self.horizontalLayout.addWidget(self.main_splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 861, 25))
         self.menubar.setObjectName("menubar")
         self.menuModel = QtGui.QMenu(self.menubar)
         self.menuModel.setObjectName("menuModel")
@@ -40,9 +56,6 @@ class Ui_MainWindow(object):
         self.menuAbout = QtGui.QMenu(self.menubar)
         self.menuAbout.setObjectName("menuAbout")
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
         self.actionImport = QtGui.QAction(MainWindow)
         self.actionImport.setObjectName("actionImport")
         self.actionData_Import = QtGui.QAction(MainWindow)
@@ -76,7 +89,6 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "MainWindow", None, QtGui.QApplication.UnicodeUTF8))
-        self.imglabel.setText(QtGui.QApplication.translate("MainWindow", "No Image Loaded", None, QtGui.QApplication.UnicodeUTF8))
         self.menuModel.setTitle(QtGui.QApplication.translate("MainWindow", "Model", None, QtGui.QApplication.UnicodeUTF8))
         self.menuImport.setTitle(QtGui.QApplication.translate("MainWindow", "Data", None, QtGui.QApplication.UnicodeUTF8))
         self.menuAbout.setTitle(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
@@ -88,14 +100,4 @@ class Ui_MainWindow(object):
         self.actionAuthor.setText(QtGui.QApplication.translate("MainWindow", "Author", None, QtGui.QApplication.UnicodeUTF8))
         self.actionVersion.setText(QtGui.QApplication.translate("MainWindow", "Version", None, QtGui.QApplication.UnicodeUTF8))
         self.actionImport_Model.setText(QtGui.QApplication.translate("MainWindow", "Import Model", None, QtGui.QApplication.UnicodeUTF8))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
 
