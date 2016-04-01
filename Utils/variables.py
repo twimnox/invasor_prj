@@ -6,5 +6,6 @@ class Variables(object):
     ML_classes = []
     TMP_DIR = "./tmp"
     CONFIG_DIR = "./yaml"
+    ZOOM_FACTOR = 1
 
 
