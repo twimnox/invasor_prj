@@ -48,8 +48,6 @@ class ImageWidget(QtGui.QWidget):
 
     def zoom_operation(self):
         if self.variables.import_data_path != "empty":
-            curr_width = self.ui.graphicsView.width()
-            curr_height = self.ui.graphicsView.height()
             img_path = self.variables.import_data_path
             scale = self.variables.ZOOM_FACTOR
 
@@ -57,6 +55,7 @@ class ImageWidget(QtGui.QWidget):
 
             tmp_name = os.path.join(self.variables.TMP_DIR, "_tmp_img.jpg") #use tempfile python lib?
             tmp_img = cv2.imread(img_path)
+            curr_height, curr_width = tmp_img.shape[:2]
             cv2.imwrite(tmp_name, tmp_img)
             img = QtGui.QImage(tmp_name)
             display_img = QtGui.QPixmap.fromImage(img)
