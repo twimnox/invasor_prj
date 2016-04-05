@@ -1,7 +1,9 @@
 import Gui.dialog_model as dm
+import os
 from PySide import QtCore, QtGui
 from PySide.QtCore import QObject, Signal, Slot
 import unicodedata
+import yaml
 
 
 class Ui_Import_Model_Interaction(QObject):
@@ -22,6 +24,7 @@ class Ui_Import_Model_Interaction(QObject):
 
 
     #SIGNALS
+    #@TODO make a slot in "Model settings" tab's dialog
     update_model_data = Signal() #Signal(String), string = "campo1#campo2#campo3..."
 
 
@@ -52,10 +55,29 @@ class Ui_Import_Model_Interaction(QObject):
         filename = (fileDialog.getExistingDirectory())
 
         format_filename = unicodedata.normalize('NFKD', filename).encode('ascii','ignore')
-
+        self.get_model_yaml_properties(format_filename)
         self.variables.export_data_path = format_filename
         self.ui.text_model_data_folder.setText(format_filename)
 
+
+
+    def get_model_yaml_properties(self, directory):
+        """
+        extracts the properties from the selected model folder
+        :param directory: directory to search for model yaml file
+        """
+        for file in os.listdir(directory):
+            if file.endswith(".yaml"):
+                yaml_file = file
+                break
+
+        with open(os.path.join(directory, yaml_file), 'r') as stream:
+            try:
+                ml_classes = yaml.load(stream)# print(yaml.load(stream))
+            except yaml.YAMLError as exc:
+                print(exc)
+
+        self.variables.classes = ml_classes
 
 
 
