@@ -60,6 +60,18 @@ class Ui_Import_Model_Interaction(QObject):
         self.ui.text_model_data_folder.setText(format_filename)
 
 
+    def display_preview_model_classes(self, ml_classes):
+        """
+        displays the selected model classes in the listview from importModel dialog
+        :param ml_classes: ml classes array from yaml file
+        """
+        model = QtGui.QStandardItemModel(self.ui.listView_model_properties)
+        for cls in ml_classes:
+            item = QtGui.QStandardItem(cls)
+            # item.setCheckable(True)
+            model.appendRow(item)
+        self.ui.listView_model_properties.setModel(model)
+
 
     def get_model_yaml_properties(self, directory):
         """
@@ -78,6 +90,10 @@ class Ui_Import_Model_Interaction(QObject):
                 print(exc)
 
         self.variables.classes = ml_classes
+        self.display_preview_model_classes(ml_classes)
+
+
+
 
 
 

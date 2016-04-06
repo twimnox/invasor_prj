@@ -87,7 +87,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QListView" name="listView">
+  <widget class="QListView" name="listView_model_properties">
    <property name="geometry">
     <rect>
      <x>40</x>

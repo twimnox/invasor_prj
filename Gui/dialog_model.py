@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'dialog_model.ui'
 #
-# Created: Tue Apr  5 18:19:15 2016
+# Created: Wed Apr  6 16:06:14 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -30,9 +30,9 @@ class Ui_Dialog(object):
         self.btn_cancel = QtGui.QPushButton(Dialog)
         self.btn_cancel.setGeometry(QtCore.QRect(350, 430, 99, 27))
         self.btn_cancel.setObjectName("btn_cancel")
-        self.listView = QtGui.QListView(Dialog)
-        self.listView.setGeometry(QtCore.QRect(40, 200, 241, 251))
-        self.listView.setObjectName("listView")
+        self.listView_model_properties = QtGui.QListView(Dialog)
+        self.listView_model_properties.setGeometry(QtCore.QRect(40, 200, 241, 251))
+        self.listView_model_properties.setObjectName("listView_model_properties")
         self.label_4 = QtGui.QLabel(Dialog)
         self.label_4.setGeometry(QtCore.QRect(40, 180, 141, 17))
         self.label_4.setObjectName("label_4")
