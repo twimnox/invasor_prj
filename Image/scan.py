@@ -18,7 +18,7 @@ class Scan(object):
 
 
     def __init__(self, variables):
-        super(ImageWidget, self).__init__()
+        super(Scan, self).__init__()
         self.ui = Ui_main_right_panel_widget()
         self.ui.setupUi(self)
         self.variables = variables
@@ -26,26 +26,44 @@ class Scan(object):
         global IMG_ROOT, PATCH_SIZE, PATCH_OVERLAP, EXPORT_DIR
         IMG_ROOT = self.variables.import_data_path
         EXPORT_DIR = self.variables.export_data_path
-        # @TODO PATCH_SIZE1 =... on model loading
+        PATCH_SIZE = 200         # @TODO PATCH_SIZE =... on model loading
+
         # @TODO PATCH_OVERLAP =... %percentage on model loading
 
         #SLOTS
 
+    def scan_img(self):
+        xml_root, xml_classes_fields = self.create_xml_template()
+        self.scanner(xml_root, xml_classes_fields)
 
 
-    def create_xml(self):
-        rect_cnt = np.uint8([0 for x in range(self.variables.NUMBER_OF_CLASSES)])
-        root = xmlET.Element("roi_coordinates")
-        xmlET.SubElement(root, "rect_", rect_cnt)
-        # @TODO load number of classes and classes names from the yaml (must create the GUI interaction for this...)
+
+    def create_xml_template(self):
+        """
+        creates XML tree for the image patches classification
+        :return: XML root and classes XML elements
+        """
+        root = xmlET.Element("root")
+
+        params = xmlET.SubElement(root, "parameters")
+        xmlET.SubElement(params, "patch_size").text = self.PATCH_SIZE
+
+        cls_list = []
+        #create a field for each class's roi_coordinates
+        for cls in self.variables.classes:
+            curr_class = xmlET.SubElement(root, cls)
+            cls_list.append(curr_class)
+
         # @TODO load the model path for further classification
-        return
+        return (root, cls_list)
 
 
-    def scanner(self):
+
+    def scanner(self, xml_root, cls_list):
         """
         Scans input image with a Width*Height window.
         The window is then classified in the selected Machine Learned model
+        Produces a XML file with coordinates for each classified type
         """
         img = cv.imread(IMG_ROOT)
         height, width = img.shape[:2]
@@ -53,23 +71,32 @@ class Scan(object):
         x_patches = width//PATCH_SIZE
         y_patches = height//PATCH_SIZE
         total_cycle = x_patches*y_patches
+        cycle = 0 # @TODO to be used in a progressbar
 
-
-        #XML vars
+        classes_rect_cnt = np.uint8([0 for x in range(self.variables.NUMBER_OF_CLASSES)])
 
 
         # CROPPING:
-        # @TODO improve with image borders
+        # @TODO improve to process image borders
         for x_p in range(0,x_patches):
-            for y_p in range(4,y_patches-4):
+            for y_p in range(0,y_patches):
                 x_p_ = x_p * PATCH_SIZE
                 y_p_ = y_p * PATCH_SIZE
-                if y_p_+PATCH_SIZE < ortho_height and x_p_+PATCH_SIZE < ortho_width:
+                if y_p_+PATCH_SIZE < height and x_p_+PATCH_SIZE < width:
                     crop_img = img[y_p_:y_p_+PATCH_SIZE, x_p_:x_p_+PATCH_SIZE]
 
-                    # @TODO classify using model
+                    predicted_class_ID = -99 # @TODO call classification routine from model package
+                    coordXY = ET.SubElement(classes[predicted_class_ID], "Rect_", classes_rect_cnt[predicted_class_ID])
+                    xmlET.SubElement(coordXY, "X").text = x_p_
+                    xmlET.SubElement(coordXY, "Y").text = y_p_
 
+                    classes_rect_cnt[predicted_class_ID] += 1
                     cycle += 1
+
+        #Write XML template to file:
+        tree = ET.ElementTree(root)
+        tree.write("predicted_rectangles.xml")
+
 
 
 

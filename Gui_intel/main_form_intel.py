@@ -3,6 +3,7 @@ from cPickle import load
 import Gui.MainWindow as mw_gui
 from dialog_load_data_intel import Ui_Data_Dialog_interaction
 from dialog_import_model_intel import Ui_Import_Model_Interaction
+from dialog_specifications_intel import Ui_Specifications_Interaction
 import cv2
 import os
 from PySide import QtCore, QtGui
@@ -32,12 +33,19 @@ if __name__ == "__main__":
 
     Ui_dit = Ui_Data_Dialog_interaction(global_vars)
     Ui_idm = Ui_Import_Model_Interaction(global_vars)
+    Ui_ds = Ui_Specifications_Interaction(global_vars)
 
 
     #CONNECTS
+
+    # tab actions:
     ui.actionData_Import.triggered.connect(Ui_dit.open_dialog)
     ui.actionImport_Model.triggered.connect(Ui_idm.open_dialog)
+    ui.actionSpecifications.triggered.connect(Ui_ds.open_dialog)
+
+    # user interface updates:
     Ui_dit.update_img.connect(img_widget.update_image)
+    Ui_idm.update_model_data.connect(Ui_ds.update_specs)
 
 
     sys.exit(app.exec_())

@@ -91,6 +91,7 @@ class Ui_Import_Model_Interaction(QObject):
 
         self.variables.classes = ml_classes
         self.display_preview_model_classes(ml_classes)
+        self.variables.NUMBER_OF_CLASSES = len(ml_classes)
 
 
 
