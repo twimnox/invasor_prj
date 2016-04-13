@@ -1,11 +1,13 @@
 # from __future__ import division
 # from zope.interface.tests.test_interface import I
 import xml.etree.cElementTree as xmlET
-import cv2 as cv
+import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 import os
 from Utils.variables import Variables
+from Model.classifier import Classifier
+
 
 
 class Scan(object):
@@ -19,8 +21,6 @@ class Scan(object):
 
     def __init__(self, variables):
         super(Scan, self).__init__()
-        self.ui = Ui_main_right_panel_widget()
-        self.ui.setupUi(self)
         self.variables = variables
 
         global IMG_ROOT, PATCH_SIZE, PATCH_OVERLAP, EXPORT_DIR
@@ -33,6 +33,10 @@ class Scan(object):
         #SLOTS
 
     def scan_img(self):
+        """
+        Main function of this class
+        creates XML templates for the image scanning outputs
+        """
         xml_root, xml_classes_fields = self.create_xml_template()
         self.scanner(xml_root, xml_classes_fields)
 
@@ -65,7 +69,7 @@ class Scan(object):
         The window is then classified in the selected Machine Learned model
         Produces a XML file with coordinates for each classified type
         """
-        img = cv.imread(IMG_ROOT)
+        img = cv2.imread(IMG_ROOT)
         height, width = img.shape[:2]
         x_p_ = y_p_ = 0
         x_patches = width//PATCH_SIZE
@@ -74,6 +78,7 @@ class Scan(object):
         cycle = 0 # @TODO to be used in a progressbar
 
         classes_rect_cnt = np.uint8([0 for x in range(self.variables.NUMBER_OF_CLASSES)])
+        cls = Classifier("empty")
 
 
         # CROPPING:
@@ -84,9 +89,9 @@ class Scan(object):
                 y_p_ = y_p * PATCH_SIZE
                 if y_p_+PATCH_SIZE < height and x_p_+PATCH_SIZE < width:
                     crop_img = img[y_p_:y_p_+PATCH_SIZE, x_p_:x_p_+PATCH_SIZE]
-
-                    predicted_class_ID = -99 # @TODO call classification routine from model package
-                    coordXY = ET.SubElement(classes[predicted_class_ID], "Rect_", classes_rect_cnt[predicted_class_ID])
+                    img = cv2.resize(crop_img, (180, 180)) #@TODO remove this. the dimentions size must come automatically from PATCH_SIZE and must consider the crop size
+                    predicted_class_ID = cls.classify(img)
+                    coordXY = xmlET.SubElement(cls_list[predicted_class_ID], ("_rect_", classes_rect_cnt[predicted_class_ID]))
                     xmlET.SubElement(coordXY, "X").text = x_p_
                     xmlET.SubElement(coordXY, "Y").text = y_p_
 
@@ -94,8 +99,8 @@ class Scan(object):
                     cycle += 1
 
         #Write XML template to file:
-        tree = ET.ElementTree(root)
-        tree.write("predicted_rectangles.xml")
+        tree = xmlET.ElementTree(root)
+        tree.write("predicted_rectangles.xml") #os.join(outputfolder, predicted_rectangles.xml)
 
 
 
