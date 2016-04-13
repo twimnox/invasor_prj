@@ -10,6 +10,7 @@ class Classifier(object):
         self.variables = variables
 
     def classify(self, patch):
+        cifar10_classify.init_tf()
         bin = self.convert_img_to_binary(patch)
         result = cifar10_classify.evaluate_one(binary_image=bin)
         return result
@@ -48,6 +49,7 @@ if __name__ == '__main__':
     path = "/home/prtricardo/tensorflow_tmp/200x200_models/acacia10_test/just 1 image/acacia106.jpg"
     img = cv2.imread(path)
     img = cv2.resize(img, (180, 180))
-    cls.classify(img)
+    res = cls.classify(img)
+    print "it's a", res, "!"
 
-    sys.exit(app.exec_())
+    # sys.exit(app.exec_())

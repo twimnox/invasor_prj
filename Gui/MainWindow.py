@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainWindow.ui'
 #
-# Created: Fri Apr  8 11:26:09 2016
+# Created: Wed Apr 13 15:01:28 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -65,8 +65,8 @@ class Ui_MainWindow(object):
         self.actionMaps.setObjectName("actionMaps")
         self.actionModel = QtGui.QAction(MainWindow)
         self.actionModel.setObjectName("actionModel")
-        self.actionTest = QtGui.QAction(MainWindow)
-        self.actionTest.setObjectName("actionTest")
+        self.actionRunModel = QtGui.QAction(MainWindow)
+        self.actionRunModel.setObjectName("actionRunModel")
         self.actionAuthor = QtGui.QAction(MainWindow)
         self.actionAuthor.setObjectName("actionAuthor")
         self.actionVersion = QtGui.QAction(MainWindow)
@@ -75,7 +75,7 @@ class Ui_MainWindow(object):
         self.actionImport_Model.setObjectName("actionImport_Model")
         self.menuModel.addAction(self.actionImport_Model)
         self.menuModel.addAction(self.actionSpecifications)
-        self.menuModel.addAction(self.actionTest)
+        self.menuModel.addAction(self.actionRunModel)
         self.menuModel.addSeparator()
         self.menuImport.addAction(self.actionData_Import)
         self.menuAbout.addAction(self.actionAuthor)
@@ -96,7 +96,7 @@ class Ui_MainWindow(object):
         self.actionData_Import.setText(QtGui.QApplication.translate("MainWindow", "Import...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionMaps.setText(QtGui.QApplication.translate("MainWindow", "Maps", None, QtGui.QApplication.UnicodeUTF8))
         self.actionModel.setText(QtGui.QApplication.translate("MainWindow", "Model", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionTest.setText(QtGui.QApplication.translate("MainWindow", "Test", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionRunModel.setText(QtGui.QApplication.translate("MainWindow", "Run", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAuthor.setText(QtGui.QApplication.translate("MainWindow", "Author", None, QtGui.QApplication.UnicodeUTF8))
         self.actionVersion.setText(QtGui.QApplication.translate("MainWindow", "Version", None, QtGui.QApplication.UnicodeUTF8))
         self.actionImport_Model.setText(QtGui.QApplication.translate("MainWindow", "Import Model", None, QtGui.QApplication.UnicodeUTF8))

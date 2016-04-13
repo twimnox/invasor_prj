@@ -179,7 +179,8 @@ def eval_once(saver, summary_writer,
         # image, labels = sess.run([images, top_k_predict_op])
         classification = sess.run(top_k_predict_op)
         print "step:", (step)
-        print "network predicted:", classification[0], "for real label:"
+        print "network predicted:", classification[0]
+        return classification[0]
         # true_count += np.sum(predictions)
         step += 1
 
@@ -231,13 +232,14 @@ def test_image(saver, logits):
     print 'Neural Network predicted', classification[0]
     return classification
 
-
-
-def evaluate_one(binary_image):
-  """Eval CIFAR-10 for a number of steps."""
+def init_tf():
   #initialize flags:
   f = flags.FLAGS
   f._parse_flags()
+
+def evaluate_one(binary_image):
+  """Eval CIFAR-10 for a number of steps."""
+
 
   with tf.Graph().as_default():
     # Get images and labels for CIFAR-10.
@@ -286,15 +288,15 @@ def evaluate_one(binary_image):
 
     ###
 
-    while True:
-      eval_once(saver, summary_writer,
-                # top_k_op,
-                top_k_predict_op, summary_op, images)
-      if FLAGS.run_once:
-        break
-      time.sleep(FLAGS.eval_interval_secs)
+    # while True:
+    res = eval_once(saver, summary_writer,
+              # top_k_op,
+              top_k_predict_op, summary_op, images)
+      # if FLAGS.run_once:
+      #   break
+      # time.sleep(FLAGS.eval_interval_secs)
 
-
+    return res
 
 
 

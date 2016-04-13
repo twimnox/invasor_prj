@@ -89,7 +89,7 @@
     </property>
     <addaction name="actionImport_Model"/>
     <addaction name="actionSpecifications"/>
-    <addaction name="actionTest"/>
+    <addaction name="actionRunModel"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuImport">
@@ -132,9 +132,9 @@
     <string>Model</string>
    </property>
   </action>
-  <action name="actionTest">
+  <action name="actionRunModel">
    <property name="text">
-    <string>Test</string>
+    <string>Run</string>
    </property>
   </action>
   <action name="actionAuthor">

@@ -11,8 +11,12 @@ from Utils import variables as vars
 from main_right_panel_widget_intel import ImageWidget
 from Gui.main_right_panel_widget import Ui_main_right_panel_widget
 from Gui.MainWindow import Ui_MainWindow
+from Image.scan import Scan
 
 
+def run_model_clicked():
+    Img_Scanner = Scan(global_vars)
+    Img_Scanner.scan_img()
 
 
 if __name__ == "__main__":
@@ -36,12 +40,15 @@ if __name__ == "__main__":
     Ui_ds = Ui_Specifications_Interaction(global_vars)
 
 
+
     #CONNECTS
 
     # tab actions:
     ui.actionData_Import.triggered.connect(Ui_dit.open_dialog)
     ui.actionImport_Model.triggered.connect(Ui_idm.open_dialog)
     ui.actionSpecifications.triggered.connect(Ui_ds.open_dialog)
+    ui.actionRunModel.triggered.connect(run_model_clicked)
+
 
     # user interface updates:
     Ui_dit.update_img.connect(img_widget.update_image)
