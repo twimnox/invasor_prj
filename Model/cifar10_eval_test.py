@@ -26,6 +26,7 @@ import os
 
 import tensorflow.python.platform
 from tensorflow.python.platform import gfile
+from tensorflow.python.platform import flags
 import numpy as np
 import tensorflow as tf
 
@@ -51,7 +52,7 @@ tf.app.flags.DEFINE_string('test_dir', '/home/prtricardo/tensorflow_tmp/200x200_
                            """Directory where to write event logs.""")
 tf.app.flags.DEFINE_string('test_file', 'mstar_test_batch.bin',
                            """Name of test file.""")
-tf.app.flags.DEFINE_integer('image_size', 24,
+tf.app.flags.DEFINE_integer('image_size', 180,
                             """Size of image.""")
 tf.app.flags.DEFINE_integer('num_classes', 4,
                             """Number of classes.""")
@@ -61,24 +62,8 @@ tf.app.flags.DEFINE_integer('num_channels', 3,
                             """Number of channels""")
 
 
-def readd_cifar10(filename_queue):
-  """Reads and parses examples from CIFAR10 data files.
-  Recommendation: if you want N-way read parallelism, call this function
-  N times.  This will give you N independent Readers reading different
-  files & positions within those files, which will give better mixing of
-  examples.
-  Args:
-    filename_queue: A queue of strings with the filenames to read from.
-  Returns:
-    An object representing a single example, with the following fields:
-      height: number of rows in the result (32)
-      width: number of columns in the result (32)
-      depth: number of color channels in the result (3)
-      key: a scalar string Tensor describing the filename & record number
-        for this example.
-      label: an int32 Tensor with the label in the range 0..9.
-      uint8image: a [height, width, depth] uint8 Tensor with the image data
-  """
+def readd_cifar10(data):
+
 
   class CIFAR10Record(object):
     pass
@@ -94,24 +79,29 @@ def readd_cifar10(filename_queue):
   image_bytes = result.height * result.width * result.depth
   # Every record consists of a label followed by the image, with a
   # fixed number of bytes for each.
-  record_bytes = label_bytes + image_bytes
+    #record_bytes = label_bytes + image_bytes
+  record_bytes = image_bytes # label_bytes + image_bytes
 
   # Read a record, getting filenames from the filename_queue.  No
   # header or footer in the CIFAR-10 format, so we leave header_bytes
   # and footer_bytes at their default of 0.
-  reader = tf.FixedLengthRecordReader(record_bytes=record_bytes)
-  result.key, value = reader.read(filename_queue)
+    # reader = tf.FixedLengthRecordReader(record_bytes=record_bytes)
+    # result.key, value = reader.read(filename_queue)
 
   # Convert from a string to a vector of uint8 that is record_bytes long.
-  record_bytes = tf.decode_raw(value, tf.uint8)
+    # record_bytes = tf.decode_raw(value, tf.uint8)
+  record_bytes = data # tf.decode_raw(data, tf.uint8)
+
 
   # The first bytes represent the label, which we convert from uint8->int32.
-  result.label = tf.cast(
-      tf.slice(record_bytes, [0], [label_bytes]), tf.int32)
+    # result.label = tf.cast(
+    #     tf.slice(record_bytes, [0], [label_bytes]), tf.int32)
 
   # The remaining bytes after the label represent the image, which we reshape
   # from [depth * height * width] to [depth, height, width].
-  depth_major = tf.reshape(tf.slice(record_bytes, [label_bytes], [image_bytes]),
+    # depth_major = tf.reshape(tf.slice(record_bytes, [label_bytes], [image_bytes]),
+    #                          [result.depth, result.height, result.width])
+  depth_major = tf.reshape(record_bytes,
                            [result.depth, result.height, result.width])
   # Convert from [depth, height, width] to [height, width, depth].
   result.uint8image = tf.transpose(depth_major, [1, 2, 0])
@@ -119,29 +109,38 @@ def readd_cifar10(filename_queue):
   return result
 
 
-def inputs():
-  filenames = [os.path.join(FLAGS.test_dir, FLAGS.test_file)]
-  for f in filenames:
-    if not gfile.Exists(f):
-      raise ValueError('Failed to find file: ' + f)
-  filename_queue = tf.train.string_input_producer(filenames,shuffle=False)
-  read_input = readd_cifar10(filename_queue)
+def inputs(bin_img):
+    # filenames = [os.path.join(FLAGS.test_dir, FLAGS.test_file)]
+    # for f in filenames:
+    #   if not gfile.Exists(f):
+    #     raise ValueError('Failed to find file: ' + f)
+    # filename_queue = tf.train.string_input_producer(filenames,shuffle=False)
+    # read_input = readd_cifar10(filename_queue)
+  read_input = readd_cifar10(bin_img)
   reshaped_image = tf.cast(read_input.uint8image, tf.float32)
   height = FLAGS.image_size
   width = FLAGS.image_size
   float_image = tf.image.per_image_whitening(reshaped_image)
   num_preprocess_threads = 1
-  images, label_batch = tf.train.batch(
-      [float_image, read_input.label],
+    # images, label_batch = tf.train.batch(
+    #     [float_image, read_input.label],
+    #     batch_size=FLAGS.batch_size_here,
+    #     num_threads=num_preprocess_threads,
+    #     capacity=FLAGS.batch_size_here)
+  images = tf.train.batch(
+      [float_image],
       batch_size=FLAGS.batch_size_here,
       num_threads=num_preprocess_threads,
       capacity=FLAGS.batch_size_here)
   tf.image_summary('images', images, max_images = 29)
-  print "label batch @inputs()", read_input.label
-  return images, tf.reshape(label_batch, [FLAGS.batch_size_here])
+    # print "label batch @inputs()", read_input.label
+    # return images, tf.reshape(label_batch, [FLAGS.batch_size_here])
+  return images
 
 
-def eval_once(saver, summary_writer, top_k_op, top_k_predict_op, summary_op, images):
+def eval_once(saver, summary_writer,
+              # top_k_op,
+              top_k_predict_op, summary_op, images):
   """Run Eval once.
 
   Args:
@@ -176,17 +175,17 @@ def eval_once(saver, summary_writer, top_k_op, top_k_predict_op, summary_op, ima
       total_sample_count = num_iter * FLAGS.batch_size_here
       step = 0
       while step < num_iter and not coord.should_stop():
-        predictions = sess.run([top_k_op])
-        image, test_labels = sess.run([images, top_k_predict_op])
+        # predictions = sess.run([top_k_op])
+        # image, labels = sess.run([images, top_k_predict_op])
         classification = sess.run(top_k_predict_op)
-        print (step, int(test_labels[0]))
-        print "network predicted:", classification[0], "for real label:", test_labels
-        true_count += np.sum(predictions)
+        print "step:", (step)
+        print "network predicted:", classification[0], "for real label:"
+        # true_count += np.sum(predictions)
         step += 1
 
       # Compute precision @ 1.
-      precision = float(true_count) / float(total_sample_count)
-      print '%s: precision @ 1 = %.3f' % (datetime.now(), precision)
+      # precision = float(true_count) / float(total_sample_count)
+      # print '%s: precision @ 1 = %.3f' % (datetime.now(), precision)
 
 
 
@@ -200,7 +199,7 @@ def eval_once(saver, summary_writer, top_k_op, top_k_predict_op, summary_op, ima
     coord.join(threads, stop_grace_period_secs=10)
 
 
-def test_image(saver, logits, img_arr):
+def test_image(saver, logits):
   """Run Eval once.
 
   Args:
@@ -224,7 +223,7 @@ def test_image(saver, logits, img_arr):
       print 'No checkpoint file found'
       return
 
-    image = img_arr
+
 
     classification = sess.run(tf.argmax(logits, 1))
 
@@ -236,22 +235,30 @@ def test_image(saver, logits, img_arr):
 
 def evaluate_one(binary_image):
   """Eval CIFAR-10 for a number of steps."""
+  #initialize flags:
+  f = flags.FLAGS
+  f._parse_flags()
+
   with tf.Graph().as_default():
     # Get images and labels for CIFAR-10.
-    eval_data = FLAGS.eval_data == 'test'
-    images, labels = inputs() # cifar10.inputs(eval_data=eval_data)
+    # eval_data = FLAGS.eval_data == 'test'
+    images = inputs(binary_image) # cifar10.inputs(eval_data=eval_data)
     print "images dimension @ evaluation:", images
-    print "image label @ evaluation:", labels
+    # print "image label @ evaluation:", labels
 
-    ## Build a Graph that computes the logits predictions from the
-    ## inference model.
+
+
+    # Build a Graph that computes the logits predictions from the
+    # inference model.
     logits = cifar10.inference(images)
 
-    ## Calculate predictions.
-    # top_k_op = tf.nn.in_top_k(logits, labels, 1)
-    # top_k_predict_op = tf.argmax(logits, 1)
 
-    ## Restore the moving average version of the learned variables for eval.
+
+    # Calculate predictions.
+    # top_k_op = tf.nn.in_top_k(logits, labels, 1)
+    top_k_predict_op = tf.argmax(logits, 1)
+
+    # Restore the moving average version of the learned variables for eval.
     variable_averages = tf.train.ExponentialMovingAverage(
       cifar10.MOVING_AVERAGE_DECAY)
     variables_to_restore = {}
@@ -263,14 +270,29 @@ def evaluate_one(binary_image):
       variables_to_restore[restore_name] = v
     saver = tf.train.Saver(variables_to_restore)
 
-    ## Build the summary operation based on the TF collection of Summaries.
-    # summary_op = tf.merge_all_summaries()
-    #
-    # graph_def = tf.get_default_graph().as_graph_def()
-    # summary_writer = tf.train.SummaryWriter(FLAGS.eval_dir,
-    #                                         graph_def=graph_def)
+    # Build the summary operation based on the TF collection of Summaries.
+    summary_op = tf.merge_all_summaries()
 
-    return test_image(saver, logits, binary_img)
+    graph_def = tf.get_default_graph().as_graph_def()
+    summary_writer = tf.train.SummaryWriter(FLAGS.eval_dir,
+                                            graph_def=graph_def)
+
+    # test_image(saver, logits)
+
+    ###Test one image
+    print "#################"
+    print "##gonna test this:"
+    print "#################"
+
+    ###
+
+    while True:
+      eval_once(saver, summary_writer,
+                # top_k_op,
+                top_k_predict_op, summary_op, images)
+      if FLAGS.run_once:
+        break
+      time.sleep(FLAGS.eval_interval_secs)
 
 
 
@@ -331,12 +353,14 @@ def evaluate():
       time.sleep(FLAGS.eval_interval_secs)
 
 
-def main(argv=None):  # pylint: disable=unused-argument
+def main(args):  # pylint: disable=unused-argument
   # cifar10.maybe_download_and_extract()
   # if gfile.Exists(FLAGS.eval_dir):
   #   gfile.DeleteRecursively(FLAGS.eval_dir)
   # gfile.MakeDirs(FLAGS.eval_dir)
-  evaluate()
+  # evaluate()
+  print "leaving cifar10_eval_test.py"
+  return
 
 
 if __name__ == '__main__':

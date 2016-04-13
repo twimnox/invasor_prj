@@ -35,7 +35,7 @@ from tensorflow.python.platform import gfile
 FLAGS = tf.app.flags.FLAGS
 
 # Basic model parameters.
-tf.app.flags.DEFINE_integer('batch_size', 32, #era 128
+tf.app.flags.DEFINE_integer('batch_size', 1, #era 128 @TODO tem de ser sempre 1
                             """Number of images to process in a batch.""")
 tf.app.flags.DEFINE_string('data_dir', '/home/prtricardo/tensorflow_tmp/200x200_models/acacia10_data',
                            """Path to the CIFAR-10 data directory.""")
@@ -347,18 +347,18 @@ def inference(images):
     _activation_summary(conv1)
 
     #visualize 3 random filters from conv layer 1
-    with tf.variable_scope('visualization'):
-        # scale weights to [0 255] and convert to uint8 (maybe change scaling?)
-        x_min = tf.reduce_min(kernel)
-        x_max = tf.reduce_max(kernel)
-        kernel_0_to_1 = (kernel - x_min) / (x_max - x_min)
-        kernel_0_to_255_uint8 = tf.cast(kernel_0_to_1, dtype=tf.float32)#tf.image.convert_image_dtype(kernel_0_to_1, dtype=tf.uint8)
-
-        # to tf.image_summary format [batch_size, height, width, channels]
-        kernel_transposed = tf.transpose (kernel_0_to_255_uint8, [3, 0, 1, 2])
-
-        # this will display random 3 filters from the 64 in conv1
-        tf.image_summary('conv1/filters', kernel_transposed, max_images=3)
+        # with tf.variable_scope('visualization'):
+        #     # scale weights to [0 255] and convert to uint8 (maybe change scaling?)
+        #     x_min = tf.reduce_min(kernel)
+        #     x_max = tf.reduce_max(kernel)
+        #     kernel_0_to_1 = (kernel - x_min) / (x_max - x_min)
+        #     kernel_0_to_255_uint8 = tf.cast(kernel_0_to_1, dtype=tf.float32)#tf.image.convert_image_dtype(kernel_0_to_1, dtype=tf.uint8)
+        #
+        #     # to tf.image_summary format [batch_size, height, width, channels]
+        #     kernel_transposed = tf.transpose (kernel_0_to_255_uint8, [3, 0, 1, 2])
+        #
+        #     # this will display random 3 filters from the 64 in conv1
+        #     tf.image_summary('conv1/filters', kernel_transposed, max_images=3)
 
 
     # # Visualize conv1 features
