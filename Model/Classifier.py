@@ -36,6 +36,8 @@ class Classifier(object):
 
                 arr_cnt += 1
 
+        return arr
+
 
 if __name__ == '__main__':
     import sys

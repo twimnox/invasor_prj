@@ -77,7 +77,7 @@ class Scan(object):
 
 
         # CROPPING:
-        # @TODO improve to process image borders
+        # @TODO improve to process image borders and with patch overlap
         for x_p in range(0,x_patches):
             for y_p in range(0,y_patches):
                 x_p_ = x_p * PATCH_SIZE
