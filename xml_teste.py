@@ -19,8 +19,8 @@ def creator():
 	return (root, cls_list)
 
 def manolo(root, classes):
-	
-	coordXY = ET.SubElement(classes[0], "coordinates")
+	inteiro = 69
+	coordXY = ET.SubElement(classes[0], ("_coordinates_"+ str(inteiro)))
 	
 	ET.SubElement(coordXY, "X").text = "800"
 	ET.SubElement(coordXY, "Y").text = "600"

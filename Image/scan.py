@@ -5,12 +5,15 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 import os
+from PySide import QtCore, QtGui
+from PySide.QtCore import QObject, Signal, Slot
 from Utils.variables import Variables
 from Model.classifier import Classifier
 
 
 
-class Scan(object):
+
+class Scan(QObject):
 
     # Write once and then Read-only global vars
     IMG_ROOT = ""
@@ -18,17 +21,19 @@ class Scan(object):
     PATCH_SIZE = 0
     PATCH_OVERLAP = 0
 
-
     def __init__(self, variables):
         super(Scan, self).__init__()
         self.variables = variables
 
         global IMG_ROOT, PATCH_SIZE, PATCH_OVERLAP, EXPORT_DIR
-        IMG_ROOT = self.variables.import_data_path
-        EXPORT_DIR = self.variables.export_data_path
         PATCH_SIZE = 200         # @TODO PATCH_SIZE =... on model loading
 
         # @TODO PATCH_OVERLAP =... %percentage on model loading
+
+    #SIGNALS
+    update_layers_list = Signal()
+
+
 
         #SLOTS
 
@@ -39,6 +44,7 @@ class Scan(object):
         """
         xml_root, xml_classes_fields = self.create_xml_template()
         self.scanner(xml_root, xml_classes_fields)
+        self.update_layers_list.emit()
 
 
 
@@ -58,7 +64,7 @@ class Scan(object):
         cls_list = []
         #create a field for each class's roi_coordinates
         for cls in self.variables.classes:
-            curr_class = xmlET.SubElement(root, cls)
+            curr_class = xmlET.SubElement(root, "class" ,name = cls)
             cls_list.append(curr_class)
 
         # @TODO load the model path for further classification
@@ -72,7 +78,9 @@ class Scan(object):
         The window is then classified in the selected Machine Learned model
         Produces a XML file with coordinates for each classified type
         """
-        img = cv2.imread(IMG_ROOT)
+        global IMG_ROOT
+
+        img = cv2.imread(self.variables.import_data_path)
         height, width = img.shape[:2]
         x_p_ = y_p_ = 0
         x_patches = width//PATCH_SIZE
@@ -94,7 +102,7 @@ class Scan(object):
                     crop_img = img[y_p_:y_p_+PATCH_SIZE, x_p_:x_p_+PATCH_SIZE]
                     resize_img = cv2.resize(crop_img, (180, 180)) #@TODO remove this. the dimentions size must come automatically from PATCH_SIZE and must consider the crop size
                     predicted_class_ID = cls.classify(resize_img)
-                    coordXY = xmlET.SubElement(cls_list[predicted_class_ID], ("_rect_" + str(classes_rect_cnt[predicted_class_ID])))
+                    coordXY = xmlET.SubElement(cls_list[predicted_class_ID], "rect", name = str(classes_rect_cnt[predicted_class_ID]))
                     xmlET.SubElement(coordXY, "X").text = str(x_p_)
                     xmlET.SubElement(coordXY, "Y").text = str(y_p_)
 
@@ -104,8 +112,11 @@ class Scan(object):
 
         #Write XML template to file:
         tree = xmlET.ElementTree(xml_root)
-        tree.write("predicted_rectangles.xml") #os.join(outputfolder, predicted_rectangles.xml)
-
+        if not (self.variables.export_data_path == "empty"):
+            tree.write(os.path.join(self.variables.export_data_path, "classification_output.xml"))
+        else:
+            print "No output folder is defined!"
+            # @TODO show dialog warning
 
 
 
