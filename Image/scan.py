@@ -51,6 +51,9 @@ class Scan(object):
 
         params = xmlET.SubElement(root, "parameters")
         xmlET.SubElement(params, "patch_size").text = self.PATCH_SIZE
+        xmlET.SubElement(params, "patch_overlap").text = self.PATCH_OVERLAP
+        xmlET.SubElement(params, "source_image").text = self.variables.import_data_path
+
 
         cls_list = []
         #create a field for each class's roi_coordinates
@@ -89,17 +92,18 @@ class Scan(object):
                 y_p_ = y_p * PATCH_SIZE
                 if y_p_+PATCH_SIZE < height and x_p_+PATCH_SIZE < width:
                     crop_img = img[y_p_:y_p_+PATCH_SIZE, x_p_:x_p_+PATCH_SIZE]
-                    img = cv2.resize(crop_img, (180, 180)) #@TODO remove this. the dimentions size must come automatically from PATCH_SIZE and must consider the crop size
-                    predicted_class_ID = cls.classify(img)
-                    coordXY = xmlET.SubElement(cls_list[predicted_class_ID], ("_rect_", classes_rect_cnt[predicted_class_ID]))
-                    xmlET.SubElement(coordXY, "X").text = x_p_
-                    xmlET.SubElement(coordXY, "Y").text = y_p_
+                    resize_img = cv2.resize(crop_img, (180, 180)) #@TODO remove this. the dimentions size must come automatically from PATCH_SIZE and must consider the crop size
+                    predicted_class_ID = cls.classify(resize_img)
+                    coordXY = xmlET.SubElement(cls_list[predicted_class_ID], ("_rect_" + str(classes_rect_cnt[predicted_class_ID])))
+                    xmlET.SubElement(coordXY, "X").text = str(x_p_)
+                    xmlET.SubElement(coordXY, "Y").text = str(y_p_)
 
                     classes_rect_cnt[predicted_class_ID] += 1
                     cycle += 1
+                    print "cycle", cycle, "of total:", total_cycle
 
         #Write XML template to file:
-        tree = xmlET.ElementTree(root)
+        tree = xmlET.ElementTree(xml_root)
         tree.write("predicted_rectangles.xml") #os.join(outputfolder, predicted_rectangles.xml)
 
 
