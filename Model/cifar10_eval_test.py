@@ -35,13 +35,16 @@ import cifar10
 import cifar10_input
 
 FLAGS = tf.app.flags.FLAGS
+IMAGE_SIZE = -1
+NUM_CLASSES = -1
+CHECK_DIR = 'empty'
 
 tf.app.flags.DEFINE_string('eval_dir', '/home/prtricardo/tensorflow_tmp/200x200_models/acacia10_eval',
                            """Directory where to write event logs.""")
 tf.app.flags.DEFINE_string('eval_data', 'test',
                            """Either 'test' or 'train_eval'.""")
-tf.app.flags.DEFINE_string('checkpoint_dir', '/home/prtricardo/tensorflow_tmp/200x200_models/acacia10_train',
-                           """Directory where to read model checkpoints.""")
+# tf.app.flags.DEFINE_string('checkpoint_dir', '/home/prtricardo/tensorflow_tmp/200x200_models/acacia10_train', #@TODO get this dynamicaly
+#                            """Directory where to read model checkpoints.""")
 tf.app.flags.DEFINE_integer('eval_interval_secs', 60 * 5,
                             """How often to run the eval.""")
 tf.app.flags.DEFINE_integer('num_examples', 1, #era 10000
@@ -52,10 +55,10 @@ tf.app.flags.DEFINE_string('test_dir', '/home/prtricardo/tensorflow_tmp/200x200_
                            """Directory where to write event logs.""")
 tf.app.flags.DEFINE_string('test_file', 'mstar_test_batch.bin',
                            """Name of test file.""")
-tf.app.flags.DEFINE_integer('image_size', 180,
-                            """Size of image.""")
-tf.app.flags.DEFINE_integer('num_classes', 4,
-                            """Number of classes.""")
+# tf.app.flags.DEFINE_integer('image_size', 180, #@TODO get this dynamicaly
+#                             """Size of image.""")
+# tf.app.flags.DEFINE_integer('num_classes', 4, #@TODO get this dynamicaly
+#                             """Number of classes.""")
 tf.app.flags.DEFINE_integer('batch_size_here', 1,
                             """Number of images to process in a batch.""")
 tf.app.flags.DEFINE_integer('num_channels', 3,
@@ -73,8 +76,8 @@ def readd_cifar10(data):
   # See http://www.cs.toronto.edu/~kriz/cifar.html for a description of the
   # input format.
   label_bytes = 1  # 2 for CIFAR-100
-  result.height = FLAGS.image_size
-  result.width = FLAGS.image_size
+  result.height = IMAGE_SIZE # FLAGS.image_size
+  result.width = IMAGE_SIZE #FLAGS.image_size
   result.depth = FLAGS.num_channels
   image_bytes = result.height * result.width * result.depth
   # Every record consists of a label followed by the image, with a
@@ -118,8 +121,8 @@ def inputs(bin_img):
     # read_input = readd_cifar10(filename_queue)
   read_input = readd_cifar10(bin_img)
   reshaped_image = tf.cast(read_input.uint8image, tf.float32)
-  height = FLAGS.image_size
-  width = FLAGS.image_size
+  height = IMAGE_SIZE# FLAGS.image_size
+  width = IMAGE_SIZE # FLAGS.image_size
   float_image = tf.image.per_image_whitening(reshaped_image)
   num_preprocess_threads = 1
     # images, label_batch = tf.train.batch(
@@ -150,7 +153,7 @@ def eval_once(saver, summary_writer,
     summary_op: Summary op.
   """
   with tf.Session() as sess:
-    ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
+    ckpt = tf.train.get_checkpoint_state(CHECK_DIR)# FLAGS.checkpoint_dir)
     if ckpt and ckpt.model_checkpoint_path:
       # Restores from checkpoint
       saver.restore(sess, ckpt.model_checkpoint_path)
@@ -232,8 +235,17 @@ def test_image(saver, logits):
     print 'Neural Network predicted', classification[0]
     return classification
 
-def init_tf():
+def init_tf(img_size, num_cls, chck_dir):
   #initialize flags:
+
+
+  global IMAGE_SIZE, NUM_CLASSES, CHECK_DIR
+  #@TODO get this variables info on .yaml load
+  IMAGE_SIZE = img_size # 180
+  NUM_CLASSES = num_cls # 4
+  CHECK_DIR = '/home/prtricardo/tensorflow_tmp/200x200_models/acacia10_train' # @TODO use chck_dir variable#
+
+
   f = flags.FLAGS
   f._parse_flags()
 
@@ -252,7 +264,7 @@ def evaluate_one(binary_image):
 
     # Build a Graph that computes the logits predictions from the
     # inference model.
-    logits = cifar10.inference(images)
+    logits = cifar10.inference(images, NUM_CLASSES)
 
 
 

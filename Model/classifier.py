@@ -10,7 +10,10 @@ class Classifier(object):
         self.variables = variables
 
     def classify(self, patch):
-        cifar10_classify.init_tf()
+        print self.variables.MODEL_IMAGE_SIZE
+        cifar10_classify.init_tf(self.variables.MODEL_IMAGE_SIZE,
+                                 self.variables.NUMBER_OF_CLASSES - 1 , # if I have n classes, model must go from 0 to n-1 classes
+                                 self.variables.model_folder_path)
         bin = self.convert_img_to_binary(patch)
         result = cifar10_classify.evaluate_one(binary_image=bin)
         return result
@@ -23,8 +26,8 @@ class Classifier(object):
         # @TODO make width and height dimensions dynamic with the program model
         # @TODO: further processing on cifar10.evaluate_one can be optimized here. for instance the [arr] shape and dtype
 
-        width = 180
-        height = 180
+        width = self.variables.MODEL_IMAGE_SIZE
+        height = self.variables.MODEL_IMAGE_SIZE
         # resized_image = cv2.resize(img, (width, height)) #unnecessary
         arr = np.uint8([0 for x in range(width*height*3)])
         one_color_bytes = width * height

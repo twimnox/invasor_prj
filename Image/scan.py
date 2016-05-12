@@ -24,6 +24,7 @@ class Scan(QObject):
     def __init__(self, variables):
         super(Scan, self).__init__()
         self.variables = variables
+        self.classifier = Classifier(variables)
 
         global IMG_ROOT, PATCH_SIZE, PATCH_OVERLAP, EXPORT_DIR
         PATCH_SIZE = 200         # @TODO PATCH_SIZE =... on model loading
@@ -89,7 +90,7 @@ class Scan(QObject):
         cycle = 0 # @TODO to be used in a progressbar
 
         classes_rect_cnt = np.uint8([0 for x in range(self.variables.NUMBER_OF_CLASSES)])
-        cls = Classifier("empty")
+        # cls = Classifier(self.variables)
 
 
         # CROPPING:
@@ -101,7 +102,7 @@ class Scan(QObject):
                 if y_p_+PATCH_SIZE < height and x_p_+PATCH_SIZE < width:
                     crop_img = img[y_p_:y_p_+PATCH_SIZE, x_p_:x_p_+PATCH_SIZE]
                     resize_img = cv2.resize(crop_img, (180, 180)) #@TODO remove this. the dimentions size must come automatically from PATCH_SIZE and must consider the crop size
-                    predicted_class_ID = cls.classify(resize_img)
+                    predicted_class_ID = self.classifier.classify(resize_img)
                     coordXY = xmlET.SubElement(cls_list[predicted_class_ID], "rect", name = str(classes_rect_cnt[predicted_class_ID]))
                     xmlET.SubElement(coordXY, "X").text = str(x_p_)
                     xmlET.SubElement(coordXY, "Y").text = str(y_p_)

@@ -37,21 +37,21 @@ FLAGS = tf.app.flags.FLAGS
 # Basic model parameters.
 tf.app.flags.DEFINE_integer('batch_size', 1, #era 128 @TODO tem de ser sempre 1
                             """Number of images to process in a batch.""")
-tf.app.flags.DEFINE_string('data_dir', '/home/prtricardo/tensorflow_tmp/200x200_models/acacia10_data',
-                           """Path to the CIFAR-10 data directory.""")
-tf.app.flags.DEFINE_integer('dataset_window_size', 200,
-                            """"Window size of the original images""")
-tf.app.flags.DEFINE_integer('noise_crop_size', 180,
-                            """"noise crop size of the original images for distortion toleration""")
+# tf.app.flags.DEFINE_string('data_dir', '/home/prtricardo/tensorflow_tmp/200x200_models/acacia10_data',
+#                            """Path to the CIFAR-10 data directory.""")
+# tf.app.flags.DEFINE_integer('dataset_window_size', 200,
+#                             """"Window size of the original images""")
+# tf.app.flags.DEFINE_integer('noise_crop_size', 180,
+#                             """"noise crop size of the original images for distortion toleration""")
 
 
 # Process images of this size. Note that this differs from the original CIFAR
 # image size of 32 x 32. If one alters this number, then the entire model
 # architecture will change and any model would need to be retrained.
-IMAGE_SIZE = FLAGS.noise_crop_size
+# IMAGE_SIZE = FLAGS.noise_crop_size
 
 # Global constants describing the CIFAR-10 data set.
-NUM_CLASSES = 4 #era 10
+# NUM_CLASSES = 4 #era 10
 NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 2400 #era 50000
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 668 #era 10000
 
@@ -322,7 +322,7 @@ def inputs(eval_data):
                                          min_queue_examples)
 
 
-def inference(images):
+def inference(images, NUM_CLASSES):
   """Build the CIFAR-10 model.
 
   Args:
