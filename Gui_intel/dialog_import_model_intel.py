@@ -1,3 +1,5 @@
+from rosdistro.writer import yaml_from_distribution_file
+
 import Gui.dialog_model as dm
 import os
 from PySide import QtCore, QtGui
@@ -78,20 +80,25 @@ class Ui_Import_Model_Interaction(QObject):
         extracts the properties from the selected model folder
         :param directory: directory to search for model yaml file
         """
+        yaml_file = "-1"
+
         for file in os.listdir(directory):
             if file.endswith(".yaml"):
                 yaml_file = file
                 break
 
-        with open(os.path.join(directory, yaml_file), 'r') as stream:
-            try:
-                ml_classes = yaml.load(stream)# print(yaml.load(stream))
-            except yaml.YAMLError as exc:
-                print(exc)
+        if yaml_file == "-1":
+            print("No yaml file avaliable!")
+        else:
+            with open(os.path.join(directory, yaml_file), 'r') as stream:
+                try:
+                    ml_classes = yaml.load(stream)# print(yaml.load(stream))
+                except yaml.YAMLError as exc:
+                    print(exc)
 
-        self.variables.classes = ml_classes
-        self.display_preview_model_classes(ml_classes)
-        self.variables.NUMBER_OF_CLASSES = len(ml_classes)
+            self.variables.classes = ml_classes
+            self.display_preview_model_classes(ml_classes)
+            self.variables.NUMBER_OF_CLASSES = len(ml_classes)
 
 
 
