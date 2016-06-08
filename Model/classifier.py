@@ -47,9 +47,10 @@ class Classifier(object):
 if __name__ == '__main__':
     import sys
 
-    #Test code:
+    #Test code (for just 1 image):
     cls = Classifier("empty")
-    path = "/home/prtricardo/tensorflow_tmp/200x200_models/acacia10_test/just 1 image/acacia106.jpg"
+    # path = "/home/prtricardo/tensorflow_tmp/200x200_models/acacia10_test/just 1 image/acacia106.jpg"
+    path = "/home/prtricardo/tese_ws/open_cv/calib_images_treshold/varios tamanhos imagens individuais/13-3-2016-1o/imagens_originais/Wood0/wood85.jpg"
     img = cv2.imread(path)
     img = cv2.resize(img, (180, 180))
     res = cls.classify(img)

@@ -143,7 +143,7 @@ def inputs(bin_img):
 
 def eval_once(saver, summary_writer,
               # top_k_op,
-              top_k_predict_op, summary_op, images):
+              top_k_predict_op, summary_op, images, predict_op_probabilities):
   """Run Eval once.
 
   Args:
@@ -181,8 +181,10 @@ def eval_once(saver, summary_writer,
         # predictions = sess.run([top_k_op])
         # image, labels = sess.run([images, top_k_predict_op])
         classification = sess.run(top_k_predict_op)
+        probabilities = sess.run(predict_op_probabilities)
         print "step:", (step)
         print "network predicted:", classification[0]
+        print "Prediction was made with ", probabilities, "accuracy"
         return classification[0]
         # true_count += np.sum(predictions)
         step += 1
@@ -230,9 +232,14 @@ def test_image(saver, logits):
 
 
     classification = sess.run(tf.argmax(logits, 1))
+    probability = sess.run(tf.nn.softmax(logits))
+
 
     print classification
     print 'Neural Network predicted', classification[0]
+
+    print "prediction was made with ", probability, " accuracy."
+
     return classification
 
 def init_tf(img_size, num_cls, chck_dir):
@@ -271,6 +278,7 @@ def evaluate_one(binary_image):
     # Calculate predictions.
     # top_k_op = tf.nn.in_top_k(logits, labels, 1)
     top_k_predict_op = tf.argmax(logits, 1)
+    predict_op_probabilities = tf.nn.softmax(logits)
 
     # Restore the moving average version of the learned variables for eval.
     variable_averages = tf.train.ExponentialMovingAverage(
@@ -303,7 +311,7 @@ def evaluate_one(binary_image):
     # while True:
     res = eval_once(saver, summary_writer,
               # top_k_op,
-              top_k_predict_op, summary_op, images)
+              top_k_predict_op, summary_op, images, predict_op_probabilities)
       # if FLAGS.run_once:
       #   break
       # time.sleep(FLAGS.eval_interval_secs)
