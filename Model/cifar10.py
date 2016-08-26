@@ -338,7 +338,7 @@ def inference(images, NUM_CLASSES):
   #
   # conv1
   with tf.variable_scope('conv1') as scope:
-    kernel = _variable_with_weight_decay('weights', shape=[11, 11, 3, 64], #era 5 5 3 64
+    kernel = _variable_with_weight_decay('weights', shape=[7, 7, 3, 64], #era 5 5 3 64
                                          stddev=1e-4, wd=0.0)
     conv = tf.nn.conv2d(images, kernel, [1, 1, 1, 1], padding='SAME')
     biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.0))
@@ -381,7 +381,7 @@ def inference(images, NUM_CLASSES):
 
   # conv2
   with tf.variable_scope('conv2') as scope:
-    kernel = _variable_with_weight_decay('weights', shape=[15, 15, 64, 64], #era 5 5 64 64
+    kernel = _variable_with_weight_decay('weights', shape=[5, 5, 64, 64], #era 5 5 64 64
                                          stddev=1e-4, wd=0.0)
     conv = tf.nn.conv2d(norm1, kernel, [1, 1, 1, 1], padding='SAME')
     biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.1))
@@ -393,7 +393,7 @@ def inference(images, NUM_CLASSES):
   norm2 = tf.nn.lrn(conv2, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75,
                     name='norm2')
   # pool2
-  pool2 = tf.nn.max_pool(norm2, ksize=[1, 13, 13, 1],
+  pool2 = tf.nn.max_pool(norm2, ksize=[1, 10, 10, 1],
                          strides=[1, 4, 4, 1], padding='SAME', name='pool2')
 
   # local3
@@ -404,7 +404,7 @@ def inference(images, NUM_CLASSES):
       dim *= d
     reshape = tf.reshape(pool2, [FLAGS.batch_size, dim])
 
-    weights = _variable_with_weight_decay('weights', shape=[dim, 384], #era 384
+    weights = _variable_with_weight_decay('weights', shape=[dim, 192], #era 384
                                           stddev=0.04, wd=0.004) #wd era 0.04
     biases = _variable_on_cpu('biases', [384], tf.constant_initializer(0.1)) #era 384
     local3 = tf.nn.relu_layer(reshape, weights, biases, name=scope.name)
@@ -412,7 +412,7 @@ def inference(images, NUM_CLASSES):
 
   # local4
   with tf.variable_scope('local4') as scope:
-    weights = _variable_with_weight_decay('weights', shape=[384, 192], #era 384, 192
+    weights = _variable_with_weight_decay('weights', shape=[192, 80], #era 384, 192
                                           stddev=0.04, wd=0.004) #wd era 0.04
     biases = _variable_on_cpu('biases', [192], tf.constant_initializer(0.1)) #era 192
     local4 = tf.nn.relu_layer(local3, weights, biases, name=scope.name)
@@ -420,7 +420,7 @@ def inference(images, NUM_CLASSES):
 
   # softmax, i.e. softmax(WX + b)
   with tf.variable_scope('softmax_linear') as scope:
-    weights = _variable_with_weight_decay('weights', [192, NUM_CLASSES], #era 192
+    weights = _variable_with_weight_decay('weights', [80, NUM_CLASSES], #era 192
                                           stddev=1/192.0, wd=0.0)
     biases = _variable_on_cpu('biases', [NUM_CLASSES],
                               tf.constant_initializer(0.0))

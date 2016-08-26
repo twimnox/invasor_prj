@@ -103,7 +103,7 @@ class Scan(QObject):
                 y_p_ = y_p * PATCH_SIZE
                 if y_p_+PATCH_SIZE < height and x_p_+PATCH_SIZE < width:
                     crop_img = img[y_p_:y_p_+PATCH_SIZE, x_p_:x_p_+PATCH_SIZE]
-                    resize_img = cv2.resize(crop_img, (180, 180)) #@TODO remove this. the dimentions size must come automatically from PATCH_SIZE and must consider the crop size
+                    resize_img = cv2.resize(crop_img, (90, 90)) #@TODO remove this. the dimentions size must come automatically from PATCH_SIZE and must consider the crop size
                     predicted_class_ID = self.classifier.classify(resize_img)
                     # populate image_placeholder with colors representing each class
                     image_placeholder[x_p, y_p, 2] = self.color_list[predicted_class_ID][0]
