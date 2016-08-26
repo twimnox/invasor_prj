@@ -25,6 +25,7 @@ class Scan(QObject):
         super(Scan, self).__init__()
         self.variables = variables
         self.classifier = Classifier(variables)
+        self.color_list = (0, 255, 0), (255, 0, 0), (0, 0, 255), (255, 230, 0), (255, 255, 255), (0, 0, 128), (128, 128, 128), (72, 72, 72), (200, 100, 200)
 
         global IMG_ROOT, PATCH_SIZE, PATCH_OVERLAP, EXPORT_DIR
         PATCH_SIZE = 200         # @TODO PATCH_SIZE =... on model loading
@@ -92,6 +93,7 @@ class Scan(QObject):
         classes_rect_cnt = np.uint8([0 for x in range(self.variables.NUMBER_OF_CLASSES)])
         # cls = Classifier(self.variables)
 
+        image_placeholder = np.zeros((height//200, width//200, 3), np.uint8) #Generate image placeholder for classifications
 
         # CROPPING:
         # @TODO improve to process image borders and with patch overlap
@@ -103,18 +105,25 @@ class Scan(QObject):
                     crop_img = img[y_p_:y_p_+PATCH_SIZE, x_p_:x_p_+PATCH_SIZE]
                     resize_img = cv2.resize(crop_img, (180, 180)) #@TODO remove this. the dimentions size must come automatically from PATCH_SIZE and must consider the crop size
                     predicted_class_ID = self.classifier.classify(resize_img)
-                    coordXY = xmlET.SubElement(cls_list[predicted_class_ID], "rect", name = str(classes_rect_cnt[predicted_class_ID]))
-                    xmlET.SubElement(coordXY, "X").text = str(x_p_)
-                    xmlET.SubElement(coordXY, "Y").text = str(y_p_)
+                    # populate image_placeholder with colors representing each class
+                    image_placeholder[x_p, y_p, 2] = self.color_list[predicted_class_ID][0]
+                    image_placeholder[x_p, y_p, 1] = self.color_list[predicted_class_ID][1]
+                    image_placeholder[x_p, y_p, 0] = self.color_list[predicted_class_ID][2]
 
-                    classes_rect_cnt[predicted_class_ID] += 1
+
+                    # coordXY = xmlET.SubElement(cls_list[predicted_class_ID], "rect", name = str(classes_rect_cnt[predicted_class_ID]))
+                    # xmlET.SubElement(coordXY, "X").text = str(x_p_)
+                    # xmlET.SubElement(coordXY, "Y").text = str(y_p_)
+
+                    # classes_rect_cnt[predicted_class_ID] += 1
                     cycle += 1
                     print "cycle", cycle, "of total:", total_cycle
 
         #Write XML template to file:
         tree = xmlET.ElementTree(xml_root)
         if not (self.variables.export_data_path == "empty"):
-            tree.write(os.path.join(self.variables.export_data_path, "classification_output.xml"))
+            # tree.write(os.path.join(self.variables.export_data_path, "classification_output.xml"))
+            cv2.imwrite(os.path.join(self.variables.TMP_DIR, "image_placeholder.jpg"), image_placeholder)
         else:
             print "No output folder is defined!"
             # @TODO show dialog warning
