@@ -93,7 +93,7 @@ class Scan(QObject):
         classes_rect_cnt = np.uint8([0 for x in range(self.variables.NUMBER_OF_CLASSES)])
         # cls = Classifier(self.variables)
 
-        image_placeholder = np.zeros((height//200, width//200, 3), np.uint8) #Generate image placeholder for classifications
+        image_placeholder = np.zeros((x_patches, y_patches, 3), np.uint8) #Generate image placeholder for classifications
 
         # CROPPING:
         # @TODO improve to process image borders and with patch overlap
@@ -106,6 +106,7 @@ class Scan(QObject):
                     resize_img = cv2.resize(crop_img, (90, 90)) #@TODO remove this. the dimentions size must come automatically from PATCH_SIZE and must consider the crop size
                     predicted_class_ID = self.classifier.classify(resize_img)
                     # populate image_placeholder with colors representing each class
+                    print x_p, "/", x_patches, y_p, "/", y_patches
                     image_placeholder[x_p, y_p, 2] = self.color_list[predicted_class_ID][0]
                     image_placeholder[x_p, y_p, 1] = self.color_list[predicted_class_ID][1]
                     image_placeholder[x_p, y_p, 0] = self.color_list[predicted_class_ID][2]
@@ -123,7 +124,7 @@ class Scan(QObject):
         tree = xmlET.ElementTree(xml_root)
         if not (self.variables.export_data_path == "empty"):
             # tree.write(os.path.join(self.variables.export_data_path, "classification_output.xml"))
-            cv2.imwrite(os.path.join(self.variables.TMP_DIR, "image_placeholder.jpg"), image_placeholder)
+            cv2.imwrite(os.path.join(self.variables.export_data_path, "image_placeholder.jpg"), image_placeholder)
         else:
             print "No output folder is defined!"
             # @TODO show dialog warning
