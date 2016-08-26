@@ -26,7 +26,7 @@ class Layers(object):
         global IMG_ROOT, PATCH_SIZE, PATCH_OVERLAP, EXPORT_DIR
         IMG_ROOT = self.variables.import_data_path
         EXPORT_DIR = self.variables.export_data_path
-        self.color_list = (0, 255, 0), (255, 0, 0), (0, 0, 255), (255, 230, 0), (255, 255, 255), (0, 0, 0), (128, 128, 128)
+        self.color_list = (0, 255, 0), (255, 0, 0), (0, 0, 255), (255, 230, 0), (255, 255, 255), (0, 0, 128), (128, 128, 128), (72, 72, 72), (200, 100, 200)
         PATCH_SIZE = 200         # @TODO PATCH_SIZE =... on model loading
 
         # @TODO PATCH_OVERLAP =... %percentage on model loading
@@ -50,10 +50,7 @@ class Layers(object):
                 cv2.rectangle(img, (x, y), (x+200, y+200), self.color_list[i], 2) #@TODO 200 size must be dynamic
                 cv2.imshow('img', img)
 
-        # finaly display the layers:
         cv2.imwrite(os.path.join(self.variables.TMP_DIR, "layered_img.jpg"), img)
-
-
 
 
 
