@@ -12,7 +12,8 @@ class Classifier(object):
     def classify(self, patch):
         print self.variables.MODEL_IMAGE_SIZE
         cifar10_classify.init_tf(self.variables.MODEL_IMAGE_SIZE,
-                                 self.variables.NUMBER_OF_CLASSES - 1 , # if I have n classes, model must go from 0 to n-1 classes
+                                 # self.variables.NUMBER_OF_CLASSES - 1 , # if I have n classes, model must go from 0 to n-1 classes
+                                 self.variables.NUMBER_OF_CLASSES,
                                  self.variables.model_folder_path)
         bin = self.convert_img_to_binary(patch)
         result = cifar10_classify.evaluate_one(binary_image=bin)

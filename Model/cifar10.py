@@ -323,6 +323,8 @@ def inputs(eval_data):
 
 
 def inference(images, NUM_CLASSES):
+
+  print "inference n_classes: ", NUM_CLASSES
   """Build the CIFAR-10 model.
 
   Args:
@@ -406,7 +408,7 @@ def inference(images, NUM_CLASSES):
 
     weights = _variable_with_weight_decay('weights', shape=[dim, 192], #era 384
                                           stddev=0.04, wd=0.004) #wd era 0.04
-    biases = _variable_on_cpu('biases', [384], tf.constant_initializer(0.1)) #era 384
+    biases = _variable_on_cpu('biases', [192], tf.constant_initializer(0.1)) #era 384
     local3 = tf.nn.relu_layer(reshape, weights, biases, name=scope.name)
     _activation_summary(local3)
 
@@ -414,7 +416,7 @@ def inference(images, NUM_CLASSES):
   with tf.variable_scope('local4') as scope:
     weights = _variable_with_weight_decay('weights', shape=[192, 80], #era 384, 192
                                           stddev=0.04, wd=0.004) #wd era 0.04
-    biases = _variable_on_cpu('biases', [192], tf.constant_initializer(0.1)) #era 192
+    biases = _variable_on_cpu('biases', [80], tf.constant_initializer(0.1)) #era 192
     local4 = tf.nn.relu_layer(local3, weights, biases, name=scope.name)
     _activation_summary(local4)
 
