@@ -25,7 +25,17 @@ class Scan(QObject):
         super(Scan, self).__init__()
         self.variables = variables
         self.classifier = Classifier(variables)
-        self.color_list = (0, 255, 0), (255, 0, 0), (0, 0, 255), (255, 230, 0), (255, 255, 255), (0, 0, 128), (128, 128, 128), (72, 72, 72), (200, 100, 200)
+        self.color_list = (0, 102, 51), (255, 255, 0), (255, 255, 204), (51, 255, 51), (51, 25, 0), (0, 51, 0), (0, 51, 25), (128, 128, 128), (255, 0, 255)
+
+        # - Vegetation #0
+        # - acacia #1
+        # - dirt #2
+        # - ShortHerbs #3
+        # - Wood #4
+        # - Pinhal
+        # - Sobral
+        # - RoadWay
+        # - other_yellow
 
         global IMG_ROOT, PATCH_SIZE, PATCH_OVERLAP, EXPORT_DIR
         PATCH_SIZE = 200         # @TODO PATCH_SIZE =... on model loading
@@ -93,7 +103,7 @@ class Scan(QObject):
         classes_rect_cnt = np.uint8([0 for x in range(self.variables.NUMBER_OF_CLASSES)])
         # cls = Classifier(self.variables)
 
-        image_placeholder = np.zeros((x_patches, y_patches, 3), np.uint8) #Generate image placeholder for classifications
+        image_placeholder = np.zeros((y_patches, x_patches, 3), np.uint8) #Generate image placeholder for classifications
 
         # CROPPING:
         # @TODO improve to process image borders and with patch overlap
@@ -107,9 +117,9 @@ class Scan(QObject):
                     predicted_class_ID = self.classifier.classify(resize_img)
                     # populate image_placeholder with colors representing each class
                     print x_p, "/", x_patches, y_p, "/", y_patches
-                    image_placeholder[x_p, y_p, 2] = self.color_list[predicted_class_ID][0]
-                    image_placeholder[x_p, y_p, 1] = self.color_list[predicted_class_ID][1]
-                    image_placeholder[x_p, y_p, 0] = self.color_list[predicted_class_ID][2]
+                    image_placeholder[y_p, x_p, 2] = self.color_list[predicted_class_ID][0]
+                    image_placeholder[y_p, x_p, 1] = self.color_list[predicted_class_ID][1]
+                    image_placeholder[y_p, x_p, 0] = self.color_list[predicted_class_ID][2]
 
 
                     # coordXY = xmlET.SubElement(cls_list[predicted_class_ID], "rect", name = str(classes_rect_cnt[predicted_class_ID]))
@@ -124,7 +134,18 @@ class Scan(QObject):
         tree = xmlET.ElementTree(xml_root)
         if not (self.variables.export_data_path == "empty"):
             # tree.write(os.path.join(self.variables.export_data_path, "classification_output.xml"))
-            cv2.imwrite(os.path.join(self.variables.export_data_path, "image_placeholder.jpg"), image_placeholder)
+            cv2.imwrite(os.path.join(self.variables.export_data_path, "image_placeholder.jpg"), image_placeholder, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+            resize_placeholder = cv2.resize()
+            cv2.imshow("result", image_placeholder)
+            #Now lets erode the image:
+            kernel = np.ones((3,3), np.uint8)
+            erosion = cv2.erode(image_placeholder, kernel, iterations = 1)
+            cv2.imwrite(os.path.join(self.variables.export_data_path, "image_placeholder_eroded.jpg"), erosion, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+            dilation = cv2.dilate(erosion, kernel, iterations = 1)
+            cv2.imwrite(os.path.join(self.variables.export_data_path, "image_placeholder_dilated.jpg"), dilation, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+
+
+            #Now lets dilate the image:
         else:
             print "No output folder is defined!"
             # @TODO show dialog warning
