@@ -104,7 +104,7 @@ class Scan(QObject):
         classes_rect_cnt = np.uint8([0 for x in range(self.variables.NUMBER_OF_CLASSES)])
         # cls = Classifier(self.variables)
 
-        image_placeholder = np.zeros((y_patches, x_patches, 3), np.uint8) #Generate image placeholder for classifications
+        image_placeholder = np.zeros((y_patches-1, x_patches-1, 3), np.uint8) #Generate image placeholder for classifications
 
         # CROPPING:
         # @TODO improve to process image borders and with patch overlap
