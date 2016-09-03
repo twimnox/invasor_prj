@@ -42,6 +42,7 @@ class Layers(object):
         root = tree.getroot()
         img = cv2.imread(self.variables.import_data_path)
 
+
         for i in range(len(self.variables.classes)):
             query = "class[@name="+"\""+self.variables.classes[i]+"\""+"]/rect"
 
@@ -54,6 +55,26 @@ class Layers(object):
 
         cv2.imwrite(os.path.join(self.variables.TMP_DIR, "layered_img.jpg"), img)
 
+        self.filtered_generate_all_layers()
+
+    # generates layers with filtered image:
+    def filtered_generate_all_layers(self):
+        print "generating all layers filtered..."
+        tree = xmlET.ElementTree(file = os.path.join(self.variables.export_data_path, "classification_output_filtered.xml"))
+        root = tree.getroot()
+        img = cv2.imread(self.variables.import_data_path)
+
+        for i in range(len(self.variables.classes)):
+            query = "class[@name="+"\""+self.variables.classes[i]+"\""+"]/rect"
+
+            for cls in root.findall(query):
+                # print "Rect id", cls.get("name")
+                x = int(cls[0].text) #X
+                y = int(cls[1].text) #Y
+                cv2.rectangle(img, (x, y), (x+200, y+200), list(reversed(self.color_list[i])), 2) #@TODO 200 size must be dynamic
+                cv2.imshow('img', img)
+
+        cv2.imwrite(os.path.join(self.variables.TMP_DIR, "layered_img_filtered.jpg"), img)
 
 
     def generate_selected_layers(self):
