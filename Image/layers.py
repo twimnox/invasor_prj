@@ -50,10 +50,10 @@ class Layers(object):
                 # print "Rect id", cls.get("name")
                 x = int(cls[0].text) #X
                 y = int(cls[1].text) #Y
-                cv2.rectangle(img, (x, y), (x+200, y+200), list(reversed(self.color_list[i])), 2) #@TODO 200 size must be dynamic
-                cv2.imshow('img', img)
+                cv2.rectangle(img, (x, y), (x+200, y+200), list(reversed(self.color_list[i])), cv2.cv.CV_FILLED) #@TODO 200 size must be dynamic
+                # cv2.imshow('img', img)
 
-        cv2.imwrite(os.path.join(self.variables.TMP_DIR, "layered_img.jpg"), img)
+        cv2.imwrite(os.path.join(self.variables.export_data_path, "layered_img.jpg"), img)
 
         self.filtered_generate_all_layers()
 
@@ -71,10 +71,10 @@ class Layers(object):
                 # print "Rect id", cls.get("name")
                 x = int(cls[0].text) #X
                 y = int(cls[1].text) #Y
-                cv2.rectangle(img, (x, y), (x+200, y+200), list(reversed(self.color_list[i])), 2) #@TODO 200 size must be dynamic
-                cv2.imshow('img', img)
+                cv2.rectangle(img, (x, y), (x+200, y+200), list(reversed(self.color_list[i])), cv2.cv.CV_FILLED) #@TODO 200 size must be dynamic
+                # cv2.imshow('img', img)
 
-        cv2.imwrite(os.path.join(self.variables.TMP_DIR, "layered_img_filtered.jpg"), img)
+        cv2.imwrite(os.path.join(self.variables.export_data_path, "layered_img_filtered.jpg"), img)
 
 
     def generate_selected_layers(self):
