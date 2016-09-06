@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import os
 from Utils.variables import Variables
 from PySide import QtCore
-
+import time
 
 
 
@@ -38,6 +38,7 @@ class Layers(object):
     @QtCore.Slot()
     def generate_all_layers(self):
         print "generating all layers..."
+        start_time = time.time()
         tree = xmlET.ElementTree(file = os.path.join(self.variables.export_data_path, "classification_output.xml"))
         root = tree.getroot()
         img = cv2.imread(self.variables.import_data_path)
@@ -54,8 +55,11 @@ class Layers(object):
                 # cv2.imshow('img', img)
 
         cv2.imwrite(os.path.join(self.variables.export_data_path, "layered_img.jpg"), img)
+        print "time elapsed: ", time.time() - start_time
 
+        start_time = time.time()
         self.filtered_generate_all_layers()
+        print "time elapsed: ", time.time() - start_time
 
     # generates layers with filtered image:
     def filtered_generate_all_layers(self):
