@@ -1,6 +1,7 @@
 # from __future__ import division
 # from zope.interface.tests.test_interface import I
-import xml.etree.cElementTree as xmlET
+import xml.etree.ElementTree as xmlET
+
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
@@ -9,6 +10,9 @@ from PySide import QtCore, QtGui
 from PySide.QtCore import QObject, Signal, Slot
 from Utils.variables import Variables
 from Model.classifier import Classifier
+import time
+import math
+import copy
 
 
 
@@ -65,7 +69,11 @@ class Scan(QObject):
         creates XML tree for the image patches classification
         :return: XML root and classes XML elements
         """
+
+
         root = xmlET.Element("root")
+
+        root.clear()
 
         params = xmlET.SubElement(root, "parameters")
         xmlET.SubElement(params, "patch_size").text = self.PATCH_SIZE
@@ -76,11 +84,15 @@ class Scan(QObject):
         cls_list = []
         #create a field for each class's roi_coordinates
         for cls in self.variables.classes:
-            curr_class = xmlET.SubElement(root, "class" ,name = cls)
+            curr_class = xmlET.SubElement(root, "class",name = cls)
             cls_list.append(curr_class)
 
         # @TODO load the model path for further classification
         return (root, cls_list)
+
+
+
+
 
 
 
@@ -91,20 +103,21 @@ class Scan(QObject):
         Produces a XML file with coordinates for each classified type
         """
         global IMG_ROOT
-        xml_root_2_filtered = xml_root
+
+        start_time = time.time()
 
         img = cv2.imread(self.variables.import_data_path)
         height, width = img.shape[:2]
         x_p_ = y_p_ = 0
-        x_patches = width//PATCH_SIZE
-        y_patches = height//PATCH_SIZE
+        x_patches = int(width/PATCH_SIZE)
+        y_patches = int(height/PATCH_SIZE)
         total_cycle = x_patches*y_patches
         cycle = 0 # @TODO to be used in a progressbar
 
         classes_rect_cnt = np.uint8([0 for x in range(self.variables.NUMBER_OF_CLASSES)])
         # cls = Classifier(self.variables)
 
-        image_placeholder = np.zeros((y_patches-1, x_patches-1, 3), np.uint8) #Generate image placeholder for classifications
+        image_placeholder = np.zeros((y_patches, x_patches, 3), np.uint8) #Generate image placeholder for classifications
 
         # CROPPING:
         # @TODO improve to process image borders and with patch overlap
@@ -112,12 +125,12 @@ class Scan(QObject):
             for y_p in range(0,y_patches):
                 x_p_ = x_p * PATCH_SIZE
                 y_p_ = y_p * PATCH_SIZE
-                if y_p_+PATCH_SIZE < height and x_p_+PATCH_SIZE < width:
+                if y_p_+PATCH_SIZE <= height and x_p_+PATCH_SIZE <= width:
                     crop_img = img[y_p_:y_p_+PATCH_SIZE, x_p_:x_p_+PATCH_SIZE]
                     resize_img = cv2.resize(crop_img, (90, 90)) #@TODO remove this. the dimentions size must come automatically from PATCH_SIZE and must consider the crop size
                     predicted_class_ID = self.classifier.classify(resize_img)
                     # populate image_placeholder with colors representing each class
-                    print x_p, "/", x_patches, y_p, "/", y_patches
+                    # print x_p, "/", x_patches, y_p, "/", y_patches
                     image_placeholder[y_p, x_p, 2] = self.color_list[predicted_class_ID][0]
                     image_placeholder[y_p, x_p, 1] = self.color_list[predicted_class_ID][1]
                     image_placeholder[y_p, x_p, 0] = self.color_list[predicted_class_ID][2]
@@ -131,37 +144,50 @@ class Scan(QObject):
                     cycle += 1
                     print "cycle", cycle, "of total:", total_cycle
 
+
+        print "classification time elapsed: ", time.time() - start_time
+
         # Write XML template to file:
         # tree = xmlET.ElementTree(xml_root)
         if not (self.variables.export_data_path == "empty"):
-            # tree.write(os.path.join(self.variables.export_data_path, "classification_output.xml"))
-            self.map_pixeled_image_to_xml(xml_root, cls_list, image_placeholder, "classification_output.xml")
+            # self.map_pixeled_image_to_xml(xml_root, cls_list, image_placeholder, "classification_output.xml")
+            self.gen_model_raw_classification(image_placeholder, width, height)
             cv2.imwrite(os.path.join(self.variables.export_data_path, "image_placeholder_.png"), image_placeholder, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+
 
             # @TODO in the layer class, make a layered image with the filtered output:
             filtered_img = self.noise_filter(image_placeholder)
-            self.map_pixeled_image_to_xml(xml_root_2_filtered, cls_list, filtered_img, "classification_output_filtered.xml")
+            self.map_pixeled_image_to_xml(xml_root, cls_list, filtered_img, "classification_output_filtered.xml")
             # Lets save our filtered image...
             cv2.imwrite(os.path.join(self.variables.export_data_path, "image_placeholder_filtered.png"), filtered_img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
 
-            # resize_placeholder = cv2.resize(image_placeholder, (100, 100))
-            # cv2.imshow("result", resize_placeholder)
-            #Now lets erode the image:
-            # kernel = np.ones((3,3), np.uint8)
-            # erosion = cv2.erode(image_placeholder, kernel, iterations = 1)
-            # cv2.imwrite(os.path.join(self.variables.export_data_path, "image_placeholder_eroded.png"), erosion, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-            # dilation = cv2.dilate(erosion, kernel, iterations = 1)
-            # cv2.imwrite(os.path.join(self.variables.export_data_path, "image_placeholder_dilated.png"), dilation, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-
-
-            #Now lets dilate the image:
         else:
             print "No output folder is defined!"
             # @TODO show dialog warning
 
+    # Generates a colored, full-scale output of the pixel map
+    def gen_model_raw_classification(self, raw_pixeled_img, width, height):
+
+        x_patches = int(width/PATCH_SIZE)
+        y_patches = int(height/PATCH_SIZE)
+        img = np.zeros((height, width, 3), np.uint8) #Generate image placeholder for classifications
+
+        for x_p in range(0, x_patches):
+            for y_p in range(0, y_patches):
+                x_p_ = x_p * PATCH_SIZE
+                y_p_ = y_p * PATCH_SIZE
+
+                predict_class_ID = self.get_class_from_color(raw_pixeled_img[y_p, x_p])
+                cv2.rectangle(img, (x_p_, y_p_), (x_p_+200, y_p_+200), list(reversed(self.color_list[predict_class_ID])), cv2.cv.CV_FILLED) #@TODO 200 size must be dynamic
+
+
+        cv2.imwrite(os.path.join(self.variables.export_data_path, "layered_img_raw.jpg"), img)
+
+
+
 
     # uses the pixeled image to generate the XML
-    def map_pixeled_image_to_xml(self, xml_root, cls_list, pixel_img, xml_filename):
+    def map_pixeled_image_to_xml(self, xml__root, cls_list, pixel_img, xml_filename):
         """
         Scans input image with a Width*Height window.
         The window is then classified in the selected Machine Learned model
@@ -190,15 +216,13 @@ class Scan(QObject):
                 xmlET.SubElement(coordXY, "X").text = str(x_p_)
                 xmlET.SubElement(coordXY, "Y").text = str(y_p_)
 
-                classes_rect_cnt[predict_class_ID] += 1
+                classes_rect_cnt[predict_class_ID] = classes_rect_cnt[predict_class_ID] + 1
                 cycle += 1
-                print "cycle", cycle, "of total:", total_cycle
-
-
+                # print "cycle", cycle, "of total:", total_cycle, " ", xml_filename, "predict_class: ", predict_class_ID
 
 
         #Write XML template to file:
-        tree = xmlET.ElementTree(xml_root)
+        tree = xmlET.ElementTree(xml__root)
         if not (self.variables.export_data_path == "empty"):
             tree.write(os.path.join(self.variables.export_data_path, xml_filename))
 
@@ -234,7 +258,7 @@ class Scan(QObject):
                         print y_p + y_k, x_p + x_k
                         curr_class = self.get_class_from_color(img_to_filter[y_p + y_k, x_p + x_k])
                         # count the occurence of each class:
-                        print "counted a class"
+                        # print "counted a class"
                         classes_presence_cnt[curr_class] += 1
 
                 # If we only had one instance of the pre classified class, we change it with the class with most counts withing the 3*3 region

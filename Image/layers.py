@@ -1,4 +1,4 @@
-import xml.etree.cElementTree as xmlET
+import xml.etree.ElementTree as xmlET
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
@@ -39,7 +39,7 @@ class Layers(object):
     def generate_all_layers(self):
         print "generating all layers..."
         start_time = time.time()
-        tree = xmlET.ElementTree(file = os.path.join(self.variables.export_data_path, "classification_output.xml"))
+        tree = xmlET.ElementTree(file = os.path.join(self.variables.export_data_path, "classification_output_filtered.xml"))
         root = tree.getroot()
         img = cv2.imread(self.variables.import_data_path)
 
@@ -54,14 +54,15 @@ class Layers(object):
                 cv2.rectangle(img, (x, y), (x+200, y+200), list(reversed(self.color_list[i])), cv2.cv.CV_FILLED) #@TODO 200 size must be dynamic
                 # cv2.imshow('img', img)
 
-        cv2.imwrite(os.path.join(self.variables.export_data_path, "layered_img.jpg"), img)
+        cv2.imwrite(os.path.join(self.variables.export_data_path, "layered_img_filtered.jpg"), img)
         print "time elapsed: ", time.time() - start_time
 
         start_time = time.time()
-        self.filtered_generate_all_layers()
+        # self.filtered_generate_all_layers()
         print "time elapsed: ", time.time() - start_time
 
     # generates layers with filtered image:
+    # DEPRECATED, THIS IS NOW DONE IN scan.gen_model_raw_classification
     def filtered_generate_all_layers(self):
         print "generating all layers filtered..."
         tree = xmlET.ElementTree(file = os.path.join(self.variables.export_data_path, "classification_output_filtered.xml"))
