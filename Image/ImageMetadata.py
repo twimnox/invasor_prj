@@ -5,8 +5,12 @@ import exifread
 class ImageMetadata(object):
 
 
-    def __init__(self, vars):
+    def __init__(self, variables):
         super(ImageMetadata, self).__init__()
+        self.variables = variables
+        f = open (self.variables.import_data_path, 'rb')
+        self.tags = exifread.process_file(f)
+
 
 
 
@@ -32,10 +36,11 @@ class ImageMetadata(object):
 
         return d + (m / 60.0) + (s / 3600.0)
 
-    def get_focal_length(self, exif_data):
+    def get_focal_length(self):
         """
         Returns the focal lenght and focal length in 20mm film
         """
+        exif_data = self.tags
         focal_length = self._get_if_exist(exif_data, 'EXIF FocalLength')
         focal_length_in_20mm = self._get_if_exist(exif_data, 'EXIF FocalLengthIn35mmFilm')
 
@@ -44,13 +49,14 @@ class ImageMetadata(object):
 
         return fl_float, focal_length_in_20mm
 
-    def get_exif_location(self, exif_data):
+    def get_exif_location(self):
         """
         Returns the latitude and longitude, if available, from the provided exif_data (obtained through get_exif_data above)
         """
         lat = None
         lon = None
         alt = None
+        exif_data = self.tags
 
         gps_latitude = self._get_if_exist(exif_data, 'GPS GPSLatitude')
         gps_latitude_ref = self._get_if_exist(exif_data, 'GPS GPSLatitudeRef')
@@ -67,27 +73,44 @@ class ImageMetadata(object):
             if gps_longitude_ref.values[0] != 'E':
                 lon = 0 - lon
         alt = str(gps_altitude)
-        alt = float(alt)
+
+        if ('/' in alt):
+            numerator, denominador = str(alt).split('/')
+            alt_float = int (numerator) / float (denominador)
+            alt = float(alt_float)
+        else:
+            alt = float(alt)
 
         return lat, lon, alt
 
 
-    def get_px_per_cm_resolution(self, altitude, fl_mm):
+    def get_cm_per_1px_resolution(self, altitude, fl_mm):
         """
-        Returns the px/cm resolution based on altitude and focal length.
+        Returns the cm/px resolution based on altitude and focal length.
         """
+        fl_float = self.get_focal_length()[0]
+        alti = self.get_exif_location()[2]
+
+        ftprintx = ((alti/fl_float)*self.variables.CAMERA_SENSOR_WIDTH)*100
+        ftprinty = ((alti/fl_float)*self.variables.CAMERA_SENSOR_HEIGTH)*100
+        res = (ftprintx/float(self.variables.IMG_WIDTH) + ftprinty/float(self.variables.IMG_HEIGTH)) / float(2) #average measurements to reduce error
+
+        return ftprintx, ftprinty, res
+
+
+
 
 
 if __name__ == '__main__':
     import sys
 
-    SENSOR_HEIGTH = 4.62
-    SENSOR_WIDTH = 6.16
+    # SENSOR_HEIGTH = 4.62
+    # SENSOR_WIDTH = 6.16
 
     #Test code (for just 1 image):
     im = ImageMetadata("empty")
 
-    f = open ("DJI_0069.JPG", 'rb')
+    f = open (self.variables.import_data_path, 'rb')
     tags = exifread.process_file(f)
     lati, longi, alti = im.get_exif_location(tags)
     print lati, longi, alti
@@ -100,6 +123,6 @@ if __name__ == '__main__':
 
     # p1 = alti/10
 
-    ftprintx = (alti/fl_float)*SENSOR_WIDTH
-    ftprinty = (alti/fl_float)*SENSOR_HEIGTH
+    ftprintx = (alti/fl_float)*self.variables.CAMERA_SENSOR_WIDTH
+    ftprinty = (alti/fl_float)*self.variables.CAMERA_SENSOR_HEIGTH
     print 'ft_x ', ftprintx, 'ft_y', ftprinty

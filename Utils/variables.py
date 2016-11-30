@@ -12,5 +12,9 @@ class Variables(object):
     MODEL_IMAGE_SIZE = 90  #@TODO -1 by default
     classes = "empty"
     layers_checkboxes = []
+    CAMERA_SENSOR_HEIGTH = 4.62 #@TODO -1 by default
+    CAMERA_SENSOR_WIDTH = 6.16 #@TODO -1 by default
+    IMG_WIDTH = -1
+    IMG_HEIGTH = -1
 
 

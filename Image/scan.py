@@ -10,6 +10,7 @@ from PySide import QtCore, QtGui
 from PySide.QtCore import QObject, Signal, Slot
 from Utils.variables import Variables
 from Model.classifier import Classifier
+from Image.ImageMetadata import ImageMetadata
 import time
 import math
 import copy
@@ -78,7 +79,29 @@ class Scan(QObject):
         params = xmlET.SubElement(root, "parameters")
         xmlET.SubElement(params, "patch_size").text = self.PATCH_SIZE
         xmlET.SubElement(params, "patch_overlap").text = self.PATCH_OVERLAP
-        xmlET.SubElement(params, "source_image").text = self.variables.import_data_path
+
+        image = xmlET.SubElement(root, "image_properties")
+        xmlET.SubElement(image, "source_image").text = self.variables.import_data_path
+        xmlET.SubElement(image, "source_width").text = str(self.variables.IMG_WIDTH)
+        xmlET.SubElement(image, "source_heigth").text = str(self.variables.IMG_HEIGTH)
+
+        #######
+        ## GEO INFO
+        #######
+        img_met = ImageMetadata(self.variables)
+        lat, long, alt = img_met.get_exif_location()
+        fl_float, fl_20 = img_met.get_focal_length()
+        footprint_x, footprint_y, res = img_met.get_cm_per_1px_resolution(alt, fl_float)
+
+
+        geo_info = xmlET.SubElement(root, "geographic_info")
+        xmlET.SubElement(geo_info, "reference_point_location").text = "center"
+        xmlET.SubElement(geo_info, "ref_longitude").text = str(long)
+        xmlET.SubElement(geo_info, "ref_latitude").text = str(lat)
+        xmlET.SubElement(geo_info, "ref_altitude").text = str(alt)
+        xmlET.SubElement(geo_info, "width_footprint").text = str(footprint_x)
+        xmlET.SubElement(geo_info, "heigth_footprint").text = str(footprint_y)
+        xmlET.SubElement(geo_info, "cm_per_1px_ratio").text = str(res)
 
 
         cls_list = []

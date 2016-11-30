@@ -2,6 +2,7 @@ import Gui.dialog_load_data as dld
 from PySide import QtCore, QtGui
 from PySide.QtCore import QObject, Signal, Slot
 import unicodedata
+import cv2
 
 
 class Ui_Data_Dialog_interaction(QObject):
@@ -57,6 +58,11 @@ class Ui_Data_Dialog_interaction(QObject):
             filename = (fileDialog.getOpenFileName())
 
         format_filename = unicodedata.normalize('NFKD', filename[0]).encode('ascii','ignore')
+
+        img = cv2.imread(format_filename)
+        height, width = img.shape[:2]
+        self.variables.IMG_WIDTH = width
+        self.variables.IMG_HEIGTH = height
 
         self.variables.import_data_path = format_filename
         self.ui.text_data_import_path.setText(format_filename)
